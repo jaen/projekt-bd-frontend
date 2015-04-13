@@ -1,0 +1,139 @@
+$transition_name: "loading-indicator-transition";
+.#{$transition_name} {
+  &-enter {
+    position: absolute !important;
+    z-index: 666 !important;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+
+    &.#{$transition_name}-enter-active {
+      opacity: 1;
+    }
+  }
+
+  &-leave {
+    position: absolute !important;
+    width: 100%;
+    opacity: 1;
+    transition: opacity 1s ease-in-out;
+
+    &.#{$transition_name}-leave-active {
+      opacity: 0;
+    }
+  }
+}
+
+//===
+
+$loading-indicator-color: $brand-primary;
+$indicator-animation-length: 1.25s;
+
+.loading-indicator:before{
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: -25px;
+    height: 12px;
+    width: 12px;
+    border-radius: 12px;
+    -webkit-animation: loading-indicator-g $indicator-animation-length ease-in-out infinite;
+            animation: loading-indicator-g $indicator-animation-length ease-in-out infinite;
+    // animation-direction: alternate;
+    //background: red;
+}
+
+.loading-indicator{
+    position: relative;
+    width: 12px;
+    height: 12px;
+    top: 46%;
+    left: 46%;
+    border-radius: 12px;
+    -webkit-animation: loading-indicator-m $indicator-animation-length ease-in-out infinite;
+            animation: loading-indicator-m $indicator-animation-length ease-in-out infinite;
+    // animation-direction: alternate;
+    //background: red;
+}
+
+.loading-indicator:after{
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 25px;
+    height: 10px;
+    width: 10px;
+    border-radius: 10px;
+    -webkit-animation: loading-indicator-d $indicator-animation-length  ease-in-out infinite;
+            animation: loading-indicator-d $indicator-animation-length ease-in-out infinite;
+    // animation-direction: alternate;
+    //background: red;
+}
+
+/*@-webkit-keyframes loading-indicator-g{
+    0%{opacity: .2;}
+    25%{opacity: 1;}
+    50%{opacity: .2;}
+    75%{opacity: .2;}
+    100%{opacity: .2;}
+}
+
+@-webkit-keyframes loading-indicator-m{
+    0%{opacity: .2;}
+    25%{opacity: .2;}
+    50%{opacity: 1;}
+    75%{opacity: .2;}
+    100%{opacity: .2;}
+}
+
+@-webkit-keyframes loading-indicator-d{
+    0%{opacity: .2;}
+    25%{opacity: .2;}
+    50%{opacity: .2;}
+    75%{opacity: 1;}
+    100%{opacity: .2;}
+}*/
+
+@-webkit-keyframes loading-indicator-g{
+    0%{background-color: rgba($loading-indicator-color, .2);}
+    25%{background-color: rgba($loading-indicator-color, 1);}
+    50%{background-color: rgba($loading-indicator-color, .2);}
+    75%{background-color: rgba($loading-indicator-color, .2);}
+    100%{background-color: rgba($loading-indicator-color, .2);}
+}
+@keyframes loading-indicator-g{
+    0%{background-color: rgba($loading-indicator-color, .2);}
+    25%{background-color: rgba($loading-indicator-color, 1);}
+    50%{background-color: rgba($loading-indicator-color, .2);}
+    75%{background-color: rgba($loading-indicator-color, .2);}
+    100%{background-color: rgba($loading-indicator-color, .2);}
+}
+
+@-webkit-keyframes loading-indicator-m{
+    0%{background-color: rgba($loading-indicator-color, .2);}
+    25%{background-color: rgba($loading-indicator-color, .2);}
+    50%{background-color: rgba($loading-indicator-color, 1);}
+    75%{background-color: rgba($loading-indicator-color, .2);}
+    100%{background-color: rgba($loading-indicator-color, .2);}
+}
+@keyframes loading-indicator-m{
+    0%{background-color: rgba($loading-indicator-color, .2);}
+    25%{background-color: rgba($loading-indicator-color, .2);}
+    50%{background-color: rgba($loading-indicator-color, 1);}
+    75%{background-color: rgba($loading-indicator-color, .2);}
+    100%{background-color: rgba($loading-indicator-color, .2);}
+}
+
+@-webkit-keyframes loading-indicator-d{
+    0%{background-color: rgba($loading-indicator-color, .2);}
+    25%{background-color: rgba($loading-indicator-color, .2);}
+    50%{background-color: rgba($loading-indicator-color, .2);}
+    75%{background-color: rgba($loading-indicator-color, 1);}
+    100%{background-color: rgba($loading-indicator-color, .2);}
+}
+@keyframes loading-indicator-d{
+    0%{background-color: rgba($loading-indicator-color, .2);}
+    25%{background-color: rgba($loading-indicator-color, .2);}
+    50%{background-color: rgba($loading-indicator-color, .2);}
+    75%{background-color: rgba($loading-indicator-color, 1);}
+    100%{background-color: rgba($loading-indicator-color, .2);}
+}

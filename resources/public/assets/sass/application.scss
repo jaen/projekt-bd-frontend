@@ -1,0 +1,60 @@
+@import "bootstrap-compass";
+@import "./variables";
+@import "./bootstrap";
+
+@import "./re-com/re-com";
+@import "./animations";
+
+body {
+    // font-family: 'Roboto', sans-serif;
+}
+
+footer {
+    height: 60px;
+    background-color: #f5f5f5;
+
+    & > .container {
+        padding-right: 15px;
+        padding-left: 15px;
+
+        .text-muted {
+            margin: 20px 0;
+        }
+    }
+}
+
+.dialog-holder {
+  z-index: 1337;
+}
+
+.loading-wrapper {
+  position: relative;
+
+  .loading-element-wrapper {
+    & > :not(.loading-indicator-wrapper) {
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    &.loading-active > :not(.loading-indicator-wrapper) {
+      opacity: 0.4;
+    }
+  }
+
+  .loading-indicator-wrapper {
+      position: absolute;
+      top: 0px;
+      bottom: 0px;
+      left: 0px;
+      right: 0px;
+      z-index: 666;
+      cursor: wait;
+
+      .loading-indicator {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+       }
+  }
+}
+

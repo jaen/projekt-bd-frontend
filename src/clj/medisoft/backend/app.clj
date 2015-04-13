@@ -59,7 +59,7 @@
                   [:body#application.home-page "hellow"]             ; tmp class for it to look nice
                   (map (fn [url] [:script {:type "text/javascript" :src url}])
                     (cons (str "/assets/javascripts/cljs-out/development/goog/base.js")
-                      (assets-link/bundle-paths request ["application.js" "material-ui.js"])))
+                      (assets-link/bundle-paths request ["application.js"])))
                   #_[:script {:type "text/javascript"} "goog.require('filemporium.client.core');"]])]
       {:status 200 :headers {"Content-Type" "text/html"} :body body}))
 

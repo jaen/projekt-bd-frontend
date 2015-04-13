@@ -31,7 +31,7 @@
                   [ring/ring-devel "1.3.2"]
                   [ring/ring-core "1.3.2"]
                   [hiccup "1.0.5"]
-                  [optimus-sass "0.0.3"]
+                  ;[optimus-sass "0.0.3"]
 
                   ;react
                   [reagent "0.5.0" :exclusions [cljsjs/react]]
@@ -73,6 +73,7 @@
                                   [ring/ring-devel "1.3.2"]
                                   [leiningen "2.5.1"]
                                   [figwheel "0.2.5"]
+                                  [lein-figwheel "0.2.5"]
                                   [weasel "0.6.0"]
                                   [com.cemerick/austin "0.1.7-SNAPSHOT"]
                                   [com.cemerick/piggieback "0.2.0"]
@@ -95,7 +96,8 @@
 
                    :figwheel {:http-server-root "public"
                               :server-port 3449
-                              :css-dirs ["resources/public/stylesheets"]
+                              :nrepl-port 7888
+                              :css-dirs ["resources/public/assets/stylesheets"]
                               ;:ring-handler projekt-bb-frontend.handler/app
                             }
 

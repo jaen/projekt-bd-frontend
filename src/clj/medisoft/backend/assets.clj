@@ -6,8 +6,7 @@
             [ring.middleware.content-type :as content-type]
             [ring.middleware.not-modified :as not-modified]
             [taoensso.timbre :as timbre]
-            [clojure.pprint :refer (pprint)]
-            [optimus-sass.core]))
+            [clojure.pprint :refer (pprint)]))
 
 (defn- make-assets-configuration [config]
   (fn []
@@ -18,10 +17,12 @@
       (apply concat resource-map))))
 
 (defn make-config-for-env []
-  {"application.css" ["/assets/stylesheets/application.scss"]
-   "material-ui.js"  ["/assets/javascripts/material-ui.js"]
+  {"application.css" ["/assets/stylesheets/application.css"]
+   ; "material-ui.js"  ["/assets/javascripts/material-ui.js"]
    "application.js"  ["/assets/javascripts/application-development.js"]
-   :assets           [#"/assets/javascripts/cljs-out/development/.+\.(js|cljs|js\.map)"]}
+   :assets           ["/assets/stylesheets/application.css.map"
+                      #"/assets/sass/.+\.scss"
+                      #"/assets/javascripts/cljs-out/development/.+\.(js|cljs|js\.map)"]}
   #_{"application.css"   [#"/assets/stylesheets/.+\.css"]
                           "application.scss"  [#"/assets/sass/.+\.scss"]
                           "application.js"    [;"/assets/javascripts/bowser.js"
