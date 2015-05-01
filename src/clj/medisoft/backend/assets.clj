@@ -19,10 +19,10 @@
 (defn make-config-for-env []
   {"application.css" ["/assets/stylesheets/application.css"]
    ; "material-ui.js"  ["/assets/javascripts/material-ui.js"]
-   "application.js"  ["/assets/javascripts/application-development.js"]
+   "application.js"  ["/assets/javascripts/application/development.js"]
    :assets           ["/assets/stylesheets/application.css.map"
                       #"/assets/sass/.+\.scss"
-                      #"/assets/javascripts/cljs-out/development/.+\.(js|cljs|js\.map)"]}
+                      #"/assets/javascripts/application/out/development/.+\.(js|cljs|js\.map)"]}
   #_{"application.css"   [#"/assets/stylesheets/.+\.css"]
                           "application.scss"  [#"/assets/sass/.+\.scss"]
                           "application.js"    [;"/assets/javascripts/bowser.js"

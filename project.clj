@@ -6,6 +6,8 @@
 
   :source-paths ["src/clj" "src/cljs" "target/generated/clj" "target/generated/cljx"]
 
+  :clean-targets ^{:protect false} ["resources/public/assets/javascripts/application"]
+
   :min-lein-version "2.5.1"
 
   :dependencies [[org.clojure/clojure "1.7.0-beta1"]
@@ -16,7 +18,7 @@
 
                   ; mock client
                   ; [http-kit "2.1.19"]
-                  [org.immutant/web "2.0.0-beta2"]
+                  [org.immutant/web "2.0.0"]
                   [ronda/routing "0.2.5"]
                   [bidi "1.18.9"]
                   [ronda/routing-bidi "0.1.1"]
@@ -36,20 +38,21 @@
                   ;react
                   [reagent "0.5.0" :exclusions [cljsjs/react]]
                   [reagent-forms "0.5.0"]
-                  [re-com "0.4.0"]
+                  [re-com "0.5.3"]
                   [rum "0.2.6" :exclusions [cljsjs/react]]
                   [cljsjs/react-with-addons "0.13.1-0"]
-                  [binaryage/devtools "0.1.2"]
+                  [binaryage/devtools "0.2.1"]
                   [cljs-ajax "0.3.9"]
                   [org.clojars.leanpixel/cljs-uuid-utils "1.0.0-SNAPSHOT"]
                   [com.palletops/leaven "0.3.0"]
                   [com.palletops/bakery-weasel "0.3.0"]
-                  [prismatic/schema "0.4.0"]
+                  [prismatic/schema "0.4.2"]
                   [cats "0.4.0"]
                   [funcool/promesa "0.1.0"]
                   [com.andrewmcveigh/cljs-time "0.3.3"]
                   [cuerdas "0.3.0"]
                   [hodgepodge "0.1.3"]
+                  [im.chit/ribol "0.4.0"]
 
                   [bouncer "0.3.2-SNAPSHOT" :exclusions [org.clojure/clojure]] ;validations
 
@@ -60,16 +63,20 @@
                   ]
   :plugins [[lein-cljsbuild "1.0.4"]]
 
+  :core.typed {:check []
+               :check-cljs []}
+
   :cljsbuild {:builds {:dev {:source-paths ["src/cljs" "target/generated/cljs"]
-                             :compiler {:output-to     "resources/public/assets/javascripts/application-development.js"
-                                        :output-dir    "resources/public/assets/javascripts/cljs-out/development"
-                                        :asset-path    "/assets/javascripts/cljs-out/development"
+                             :compiler {:output-to     "resources/public/assets/javascripts/application/development.js"
+                                        :output-dir    "resources/public/assets/javascripts/application/out/development"
+                                        :asset-path    "/assets/javascripts/application/out/development"
                                         :externs       ["externs/material-ui-externs.js"]
                                         :optimizations :none
                                         :pretty-print  true
                                         :source-map    true}}}}
 
-  :profiles {:dev {:dependencies [[ring-mock "0.1.5"]
+  :profiles {:dev {:dependencies [[org.clojure/core.typed "0.2.84"]
+                                  [ring-mock "0.1.5"]
                                   [ring/ring-devel "1.3.2"]
                                   [leiningen "2.5.1"]
                                   [figwheel "0.2.5"]
@@ -79,7 +86,8 @@
                                   [com.cemerick/piggieback "0.2.0"]
                                   [org.clojure/tools.nrepl "0.2.10"]
                                   [pjstadig/humane-test-output "0.7.0"]
-                                  [com.keminglabs/cljx "0.6.0"]]
+                                  [com.keminglabs/cljx "0.6.0"]
+                                  [lein-typed "0.3.5"]]
 
                    :source-paths ["env/dev/clj"]
 

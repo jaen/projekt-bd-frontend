@@ -11801,6 +11801,10 @@ code {
     background-color: rgba(51, 122, 183, 0.2);
   }
 }
+.container {
+  width: 95%;
+}
+
 footer {
   height: 60px;
   background-color: #f5f5f5;

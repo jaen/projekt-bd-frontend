@@ -58,9 +58,7 @@
                      (assets-link/bundle-paths request ["application.css"]))]
                   [:body#application.home-page "hellow"]             ; tmp class for it to look nice
                   (map (fn [url] [:script {:type "text/javascript" :src url}])
-                    (cons (str "/assets/javascripts/cljs-out/development/goog/base.js")
-                      (assets-link/bundle-paths request ["application.js"])))
-                  #_[:script {:type "text/javascript"} "goog.require('filemporium.client.core');"]])]
+                       (assets-link/bundle-paths request ["application.js"]))])]
       {:status 200 :headers {"Content-Type" "text/html"} :body body}))
 
 (def handlers
