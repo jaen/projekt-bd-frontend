@@ -34,7 +34,7 @@
 ;; common schemas
 
 (def EntityReference
-  {:class schema/Str
+  {(schema/optional-key :class) schema/Str
    :id    schema/Int})
 
 (def PersonalId
@@ -71,13 +71,18 @@
 (def EmployeesListResponse
   [Employee])
 
-;; patient schems
+;; patient schemas
 
 (def Patient
   (merge EntityReference
          PersonalInformation
          {:medical-visits      [EntityReference]
           :prescription #_s       [EntityReference]}))
+
+(def PatientListQuery
+  {(schema/optional-key :firstname)   schema/Str
+   (schema/optional-key :surname)     schema/Str
+   (schema/optional-key :personal-id) schema/Str})
 
 (def PatientsListResponse
   [Patient])
@@ -91,3 +96,10 @@
 (def PatientCreateResponse
   (schema/either Patient
                  (errors-response PatientCreateRequest)))
+
+(def PatientUpdateRequest
+  (merge ; EntityReference
+         PersonalInformation))
+
+(def PatientUpdateResponse
+  PatientCreateResponse)

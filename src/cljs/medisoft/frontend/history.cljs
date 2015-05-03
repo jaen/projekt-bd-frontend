@@ -5,21 +5,30 @@
             [goog.window :as window]
             [medisoft.frontend.log :as log]
             [medisoft.frontend.routes :as routes]
-            [medisoft.frontend.ui.application :as ui-main]
+    ;[medisoft.frontend.ui.application :as ui-main]
             [bidi.bidi :as bidi]
-            [cuerdas.core :as str])
+            [cuerdas.core :as str]
+            [medisoft.frontend.logic :as logic]
+            [medisoft.frontend.api :as api])
   (:import [goog.history Html5History]
            [goog.events EventType Event BrowserEvent]
            [goog History]))
 
 (def handlers
-  {:home/dashboard  (fn []       (ui-main/set-current-page! :home/dashboard))
-   :patients/list   (fn []       (ui-main/set-current-page! :patients/list))
-   :patients/show   (fn [params] (ui-main/set-current-page! :patients/show params))
-   :patients/edit   (fn [params] (ui-main/set-current-page! :patients/edit params))
-   :patients/create (fn [params] (ui-main/set-current-page! :patients/create params))})
+  {:home/dashboard  (fn []       (logic/set-current-page! :home/dashboard))
+   :patients/list   (fn []       (logic/set-current-page! :patients/list))
+   :patients/show   (fn [params] (logic/set-current-page! :patients/show params))
+   :patients/edit   (fn [params] (logic/set-current-page! :patients/edit params))
+   :patients/create (fn [params] (logic/set-current-page! :patients/create params))})
 
 ;;
+
+(def history-impl (atom nil))
+
+(defn navigate-to! [url]
+  (let [url (str/replace-first url #"^/" "")]
+    (log/debug "settting url to:" url)
+    (.setToken @history-impl url)))
 
 (defn- match-bidi-route [path]
   (let [route (bidi/match-route routes/app-routes path)]
@@ -30,8 +39,14 @@
   (let [token      (str "/" (.-token e))
         bidi-route (match-bidi-route token)
         handler    (get handlers (:handler bidi-route))]
-    (log/debug "navigated to route: " bidi-route)
-    (handler (:route-params bidi-route))))
+    (if (and (not @api/logged-in?)
+             (not= token "/"))
+      (do
+        (log/debug "user not logged in, returning to home")
+        (navigate-to! (routes/app-path-for :home/dashboard)))
+      (do
+        (log/debug "navigated to route: " bidi-route)
+        (handler (:route-params bidi-route))))))
 
 ;; see this.transformer_ at http://goo.gl/ZHLdwa
 (def ^{:doc "Custom token transformer that preserves hashes"}
@@ -68,7 +83,10 @@
    This function lets us ignore the first event that history-imp fires when we enable it. We'll
    manually dispatch if there is no error code from the server."
   [history-imp]
-  (events/listenOnce history-imp goog.history.EventType.NAVIGATE #(setup-dispatcher! history-imp)))
+  (events/listenOnce history-imp goog.history.EventType.NAVIGATE (fn [e]
+                                                                   (set-current-token! history-imp)
+                                                                   (handle-dispatch e) ; TODO: check how it related to docstring
+                                                                   (setup-dispatcher! history-imp))))
 
 (defn disable-erroneous-popstate!
   "Stops the browser's popstate from triggering NAVIGATION events unless the url has really
@@ -115,6 +133,9 @@
                           location (when target (str (.-pathname target) (.-search target) (.-hash target)))
                           new-token (when (seq location) (subs location 1))]
                      (when (and (seq location)
+                                (not (let [value (str/strip (.. target -attributes -href -value))] ;; INFO: to not navigate on empty hrefs
+                                       (or (str/blank? value)
+                                           (= "#" value))))
                                 (= (.. js/window -location -hostname)
                                    (.-hostname target))
                                 (not (or (new-window-click? %) (= (.-target target) "_blank"))))
@@ -141,5 +162,11 @@
     (bootstrap-dispatcher!)
     (set-current-token!) ; Stop Safari from double-dispatching
     (disable-erroneous-popstate!) ; Stop Safari from double-dispatching
-    (.setEnabled true) ; This will fire a navigate event with the current token
-    (setup-link-dispatcher! top-level-node)))
+    (setup-link-dispatcher! top-level-node)
+    ; (.setEnabled true) ; This will fire a navigate event with the current token
+    ))
+
+(defn setup-history! [top-level-node]
+  (let [history (new-history-impl top-level-node)]
+    (reset! history-impl history)
+    (.setEnabled history true) ))

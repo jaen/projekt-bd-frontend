@@ -25,7 +25,7 @@
   (install-devtools)
   (setup-error-handler)
   (mount-root)
-  (history/new-history-impl (.-body js/document)))
+  (history/setup-history! (.-body js/document)))
 
 #_(let [flat-button (.-RaisedButton js/MaterialUI)
           text-field  (.-TextField js/MaterialUI)]

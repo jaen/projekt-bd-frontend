@@ -1,6 +1,8 @@
 (ns medisoft.frontend.ui.utils
   (:require [reagent.core :as reagent]
-            [medisoft.frontend.utils :as utils]))
+            [medisoft.frontend.utils :as utils]
+            [cuerdas.core :as str]
+            [re-com.core :as rc-core]))
 
 (defn- node-has-parent-pred? [node pred]
   (loop [node (.-parentNode node)]
@@ -39,3 +41,24 @@
        :component-will-unmount (fn [_] (.removeEventListener js/document "click" @component-blur-notifier))
        :reagent-render         (fn [_ & contents]
                                  (vec (cons :span contents)))})))
+
+(defn labelize [str]
+  (str/titleize (str/humanize (name str))))
+
+(defn make-form-field-maker [data errors]
+  (let [] ;atom atom]
+    (fn [name' opts]
+      ; (log/debug "welp:" atom name' (get @atom name'))
+      [rc-core/v-box :class    "form-group"
+       :children [[:label #_{:for "login-form-login"} (labelize name')]
+                  [rc-core/input-text :model (or (get @data name') "")
+                   :on-change   #(swap! data assoc name' %)
+                   ;:placeholder "Enter login"
+                   :class       "form-control"
+                   :width "100%"
+                   :status      (when (get @errors name') :error)
+                   ;:attr        {:id "login-form-login"}
+                   ]
+                  (when (name' @errors) [rc-core/label :label (str/join ", " (name' @errors))
+                                         :style {:padding-top "10px"}
+                                         :class "text-danger"])]])))

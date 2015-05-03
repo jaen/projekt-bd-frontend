@@ -19,12 +19,13 @@
 (def server-routes ["/" [["api/" [["login"  :api.authentication/log-in]
                                   ["logout" :api.authentication/log-out]
 
-                                  ["employee/" [["list"        :api.employees/list]
-                                                ["create"      :api.employees/create]]]
-                                  ["patient/"  [[[:id]         :api.patients/show]
-                                                [[:id "/edit"] :api.patients/edit]
-                                                ["list"        :api.patients/list]
-                                                ["create"      :api.patients/create]]]]]]])
+                                  ["employee/" [[""     :api.employees/list]
+                                                [""     :api.employees/create]]]
+                                  ["patients/"  [[[:id] :api.patients/show]
+                                                 [[:id] :api.patients/update]
+                                                 [""    :api.patients/list]
+                                                 [""    :api.patients/create]
+                                                 #_["delete"      :api.patients/delete]]]]]]])
 
 (defn server-path-for [& args]
   (let [path (apply bidi/path-for server-routes args)]
