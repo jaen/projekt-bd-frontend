@@ -2,7 +2,9 @@
   (:require [reagent.core :as reagent]
             [medisoft.frontend.utils :as utils]
             [cuerdas.core :as str]
-            [re-com.core :as rc-core]))
+            [re-com.core :as rc-core]
+            [medisoft.frontend.ui.dropdown :as dropdown]
+            [medisoft.frontend.log :as log]))
 
 (defn- node-has-parent-pred? [node pred]
   (loop [node (.-parentNode node)]
@@ -45,20 +47,51 @@
 (defn labelize [str]
   (str/titleize (str/humanize (name str))))
 
+(defmulti form-field-component (fn [_ opts] (:type opts)))
+
+(defmethod form-field-component :input [name' {:keys [data errors] :as opts}]
+  [rc-core/v-box :class    "form-group"
+   :children [[:label #_{:for "login-form-login"} (labelize name')]
+              [rc-core/input-text :model (or (get @data name') "")
+                                  :on-change   #(swap! data assoc name' %)
+                                  ;:placeholder "Enter login"
+                                  :class       "form-control"
+                                  :width "100%"
+                                  :status      (when (get @errors name') :error)
+                                  ;:attr        {:id "login-form-login"}
+                                  ]
+              (when (name' @errors) [rc-core/label :label (str/join ", " (name' @errors))
+                                     :style {:padding-top "10px"}
+                                     :class "text-danger"])]])
+
+(defmethod form-field-component :select [name' {:keys [data errors choices model on-change] :as opts}]
+  [rc-core/v-box :class    "form-group"
+   :children [[:label #_{:for "login-form-login"} (labelize name')]
+              [dropdown/single-dropdown :choices choices
+                                        :model   (or model (get @data name') "")
+                                        :class   (str/join " " [(when (get @errors name') "has-error")])
+                                        :label-fn (fn [choice] (:name choice))
+                                        :width "100%"
+                                        :filter-box? true
+                                        :on-change (or on-change #(swap! data assoc name' %))]
+              (when (name' @errors) [rc-core/label :label (str/join ", " (name' @errors))
+                                                   :style {:padding-top "10px"}
+                                                   :class "text-danger"])]])
+
+(defmethod form-field-component :checkbox [name' {:keys [data errors] :as opts}]
+  (log/debug "checkbox data" opts)
+  [rc-core/v-box :class    "form-group"
+                 :children [[:label #_{:for "login-form-login"} (labelize name')]
+                            [rc-core/checkbox  :model (or (get @data name') false)
+                                               :on-change #(do (log/debug "SWAPPING!" %) (swap! data assoc name' %))]]])
+
 (defn make-form-field-maker [data errors]
-  (let [] ;atom atom]
+  (let [default-opts {:type :input}] ;atom atom]
     (fn [name' opts]
-      ; (log/debug "welp:" atom name' (get @atom name'))
-      [rc-core/v-box :class    "form-group"
-       :children [[:label #_{:for "login-form-login"} (labelize name')]
-                  [rc-core/input-text :model (or (get @data name') "")
-                   :on-change   #(swap! data assoc name' %)
-                   ;:placeholder "Enter login"
-                   :class       "form-control"
-                   :width "100%"
-                   :status      (when (get @errors name') :error)
-                   ;:attr        {:id "login-form-login"}
-                   ]
-                  (when (name' @errors) [rc-core/label :label (str/join ", " (name' @errors))
-                                         :style {:padding-top "10px"}
-                                         :class "text-danger"])]])))
+      (form-field-component name' (merge default-opts opts {:data data :errors errors}))
+      )))
+
+(defn key-for [entity]
+  (let [class (str/dasherize (last (str/split (:class entity) ".")))
+        id    (:id entity)]
+    (str class ":" id)))

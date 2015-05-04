@@ -33,9 +33,12 @@
 
 ;; common schemas
 
+(def EntityId
+  schema/Int)
+
 (def EntityReference
   {(schema/optional-key :class) schema/Str
-   :id    schema/Int})
+   :id    EntityId})
 
 (def PersonalId
   schema/Str)
@@ -54,22 +57,69 @@
    :city                schema/Str
    :country             schema/Str})
 
-;; patients schemas
+;; job title schemas
+
+(def JobTitle
+  (merge EntityReference
+         {:name schema/Str}))
+
+(def JobTitleListResponse
+  [JobTitle])
+
+(def JobTitleShowResponse
+  JobTitle)
+
+(def JobTitleCreateRequest
+  {:name schema/Str})
+
+(def JobTitleCreateResponse
+  (schema/either JobTitle
+                 (errors-response JobTitleCreateRequest)))
+
+(def JobTitleUpdateRequest
+  {:name schema/Str})
+
+(def JobTitleUpdateResponse
+  JobTitleCreateResponse)
+
+;; employee schemas
 
 (def Employee
   (merge EntityReference
          PersonalInformation
          {:is-doctor           schema/Bool
           :device-reservations [EntityReference]
-          :job-title           [EntityReference]
+          :room-reservations   [EntityReference]
+          :job-title           EntityReference
           :medical-visits      [EntityReference]
-          :prescription #_s       [EntityReference]
+          :prescriptions       [EntityReference]
           :schedules           [EntityReference]
           :specializations     [EntityReference]
           :users               [EntityReference]}))
 
-(def EmployeesListResponse
+(def EmployeeListResponse
   [Employee])
+
+(def EmployeeShowResponse
+  Employee)
+
+(def EmployeeCreateRequest
+  (merge PersonalInformation
+         {:is-doctor schema/Bool
+          (schema/optional-key :job-title) EntityReference
+          (schema/optional-key :user)      EntityReference
+          (schema/optional-key :specialization) EntityReference}))
+
+(def EmployeeCreateResponse
+ (schema/either Employee
+                (errors-response EmployeeCreateRequest)))
+
+(def EmployeeUpdateRequest
+  (merge ; EntityReference
+    EmployeeCreateRequest))
+
+(def EmployeeUpdateResponse
+  EmployeeCreateResponse)
 
 ;; patient schemas
 
@@ -84,7 +134,7 @@
    (schema/optional-key :surname)     schema/Str
    (schema/optional-key :personal-id) schema/Str})
 
-(def PatientsListResponse
+(def PatientListResponse
   [Patient])
 
 (def PatientShowResponse

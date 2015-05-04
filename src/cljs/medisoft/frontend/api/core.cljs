@@ -120,7 +120,7 @@
           (if-not (schema-utils/error? coerced-response)
             (do
               (log/error (str "ERROR - " method " " uri) (merge response {:response coerced-response}))
-              (handler (handler [:error (merge response {:response coerced-response})])))
+              (handler [:error (merge response {:response coerced-response})]))
             (throw (schema.utils/error-val coerced-response)) #_(ex/raise :response-validation-failed coerced-response)))
         (do
           (log/error (str "ERROR - " method " " uri) response)
@@ -140,7 +140,7 @@
         auth-headers                (when-let [token @api-token]
                                       {:headers {"X-Auth-Token" token}})
         response-fn                 (or (:response-fn opts) #())
-        method-str                  (str/capitalize (name method))
+        method-str                  (str/upper (name method))
         wrapped-handler             (wrap-handler response-fn response-schema method-str uri)
         wrapped-error-handler       (wrap-error-handler response-fn response-schema method-str uri)
         handlers                    (into {} (filter second {:handler wrapped-handler :error-handler wrapped-error-handler}))
@@ -151,6 +151,7 @@
         ;params                      {:params (map->api-request original-params)}
         api-opts                    (merge (merge-with merge (dissoc opts :schema) auth-headers)
                                            handlers format)]
+    (log/debug (str "sending request - " method " " uri) api-opts)
     (when-not request-schema
       (log/warn "no request schema for" method uri))
     (when-not response-schema

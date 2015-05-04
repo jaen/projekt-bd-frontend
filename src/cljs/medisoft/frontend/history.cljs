@@ -16,6 +16,17 @@
 
 (def handlers
   {:home/dashboard  (fn []       (logic/set-current-page! :home/dashboard))
+
+   :job-titles/list   (fn []       (logic/set-current-page! :job-titles/list))
+   :job-titles/show   (fn [params] (logic/set-current-page! :job-titles/show params))
+   :job-titles/edit   (fn [params] (logic/set-current-page! :job-titles/edit params))
+   :job-titles/create (fn [params] (logic/set-current-page! :job-titles/create params))
+
+   :employees/list   (fn []       (logic/set-current-page! :employees/list))
+   :employees/show   (fn [params] (logic/set-current-page! :employees/show params))
+   :employees/edit   (fn [params] (logic/set-current-page! :employees/edit params))
+   :employees/create (fn [params] (logic/set-current-page! :employees/create params))
+
    :patients/list   (fn []       (logic/set-current-page! :patients/list))
    :patients/show   (fn [params] (logic/set-current-page! :patients/show params))
    :patients/edit   (fn [params] (logic/set-current-page! :patients/edit params))

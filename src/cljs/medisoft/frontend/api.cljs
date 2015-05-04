@@ -1,5 +1,7 @@
 (ns medisoft.frontend.api
   (:require [medisoft.frontend.api.core :as core]
+            [medisoft.frontend.api.job-titles :as job-titles]
+            [medisoft.frontend.api.employees :as employees]
             [medisoft.frontend.api.patients :as patients]
             [medisoft.frontend.routes :as routes]
             [medisoft.frontend.log :as log]
@@ -21,11 +23,25 @@
                                    :response schemas/LoginResponse}
                  :response-fn     callback}))
 
+;; job titles API
+
+(def list-job-titles   job-titles/list)
+(def get-job-title     job-titles/get)
+(def create-job-title job-titles/create)
+(def update-job-title job-titles/update)
+
+
+;; employees API
+
+(def list-employees   employees/list)
+(def get-employee     employees/get)
+(def create-employee employees/create)
+(def update-employee employees/update)
+
+
 ;; patients API
 
 (def list-patients patients/list)
 (def get-patient patients/get)
 (def create-patient patients/create)
 (def update-patient patients/update)
-
-;; employees

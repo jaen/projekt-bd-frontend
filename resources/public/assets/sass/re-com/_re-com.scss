@@ -910,18 +910,20 @@ html, body {
   color: #f57c00;
 }
 
-.has-error .form-control {
-  border-color: #d50000;
-}
+.has-error  {
+  .form-control, .chosen-single {
+    border-color: #d50000;
+  }
 
-.has-error .form-control:focus {
-  border-color: #d50000;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px rgba(213, 0, 0, 0.6);
-}
+  .form-control:focus .chosen-single {
+    border-color: #d50000;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px rgba(213, 0, 0, 0.6);
+  }
 
-/* TODO: REMOVE */
-.has-error .form-control-feedback {
-  color: #d50000;
+  /* TODO: REMOVE */
+  .form-control-feedback .chosen-single {
+    color: #d50000;
+  }
 }
 
 .rc-input-text .md-error {

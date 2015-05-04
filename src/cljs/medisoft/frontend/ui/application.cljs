@@ -9,6 +9,8 @@
             [medisoft.frontend.api :as api]
             [medisoft.frontend.ui.utils :as ui-utils]
             [medisoft.frontend.ui.dashboard :as dashboard]
+            [medisoft.frontend.ui.job-titles :as job-titles]
+            [medisoft.frontend.ui.employees :as employees]
 
             [medisoft.frontend.log :as log]
             [medisoft.frontend.validations :as validations]
@@ -55,15 +57,28 @@
      [:a.navbar-brand {:href (routes/app-path-for :home/dashboard)} "MediApp"]]
     [:div.navbar-collapse.collapse
      [user-component]
-     [:ul.nav.navbar-nav.navbar-right
-      (if @api/logged-in?
-        [:li [:a {:href (routes/app-path-for :patients/list)} "Patients"]])]]]])
+      (when @api/logged-in?
+        [:ul.nav.navbar-nav.navbar-right
+          [:li [:a {:href (routes/app-path-for :job-titles/list)} "Job Titles"]]
+          [:li [:a {:href (routes/app-path-for :employees/list)} "Employees"]]
+          [:li [:a {:href (routes/app-path-for :patients/list)} "Patients"]]])]]])
 
 (defn main-component []
   [:div.container {:style {:flex "1 1 0px" :padding "70px 0px 20px 0px"}}
    (if @api/logged-in?
      (match @logic/current-page
             :home/dashboard  [dashboard/dashboard-component]
+
+            :job-titles/list   [job-titles/job-title-list-component]
+            :job-titles/show   [job-titles/job-title-show-component]
+            :job-titles/create [job-titles/job-title-create-form-component]
+            :job-titles/edit   [job-titles/job-title-edit-form-component]
+
+            :employees/list   [employees/employee-list-component]
+            :employees/show   [employees/employee-show-component]
+            :employees/create [employees/employee-create-form-component]
+            :employees/edit   [employees/employee-edit-form-component]
+
             :patients/list   [patients/patient-list-component]
             :patients/show   [patients/patient-show-component]
             :patients/create [patients/patient-create-form-component]

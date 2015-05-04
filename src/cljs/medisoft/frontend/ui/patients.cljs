@@ -88,8 +88,21 @@
       [:div.col-lg-3 [form-input :country]]]
      [:a.btn.btn-success {:on-click on-submit} submit-button-text]]))
 
+(def empty-patient
+  {:firstname      ""
+   :surname        ""
+   :personal-id    ""
+   :street-name    ""
+   :flat-number    ""
+   :house-number   ""
+   :zip-code       ""
+   :city           ""
+   :country        ""
+   })
+
+
 (defn patient-create-form-component []
-  (let [patient (reagent/atom {})
+  (let [patient (reagent/atom empty-patient)
         errors  (reagent/atom {})
         on-submit (fn [e]
                     (api/create-patient @patient
