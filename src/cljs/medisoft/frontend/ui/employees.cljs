@@ -83,6 +83,7 @@
         [:div.col-lg-2 [form-input :personal-id]]
         [:div.col-lg-4 [form-input :job-title {:model (ratom/reaction (get-in @employee [:job-title :id]))
                                                :on-change #(swap! employee update-in [:job-title] assoc :id %)
+                                               :label-fn #(:name %)
                                                :type :select
                                                :choices job-titles}]]
         [:div.col-lg-2 [form-input :is-doctor {:type :checkbox}]]]

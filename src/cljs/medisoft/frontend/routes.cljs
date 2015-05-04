@@ -15,7 +15,12 @@
                       ["patients" [[""                  :patients/list]
                                    ["/create"           :patients/create]
                                    [["/" :id] [[""      :patients/show]
-                                               ["/edit" :patients/edit]]]]]]])
+                                               ["/edit" :patients/edit]]]]]
+                      ["medicines" [[""                  :medicines/list]
+                                    ["/create"           :medicines/create]
+                                    [["/" :id] [[""      :medicines/show]
+                                                ["/edit" :medicines/edit]]]]]
+                      ]])
 
 (defn app-path-for [& args]
   (apply bidi/path-for app-routes args))
@@ -24,7 +29,8 @@
 
 (def base-address "//localhost:8080/mediApp")
 
-(def server-routes ["/" [["api/" [["login"  :api.authentication/log-in]
+(def server-routes ["/" [["explicit/login" :api.authentication/validate-log-in]
+                         ["api/" [["login"  :api.authentication/log-in]
                                   ["logout" :api.authentication/log-out]
 
                                   ["job-titles/"  [[[:id] :api.job-titles/show]
@@ -43,7 +49,13 @@
                                                  [[:id] :api.patients/update]
                                                  [""    :api.patients/list]
                                                  [""    :api.patients/create]
-                                                 #_["delete"      :api.patients/delete]]]]]]])
+                                                 #_["delete"      :api.patients/delete]]]
+
+                                  ["medicines/"  [[[:id] :api.medicines/show]
+                                                  [[:id] :api.medicines/update]
+                                                  [""    :api.medicines/list]
+                                                  [""    :api.medicines/create]
+                                                  #_["delete"      :api.patients/delete]]]]]]])
 
 (defn server-path-for [& args]
   (let [path (apply bidi/path-for server-routes args)]

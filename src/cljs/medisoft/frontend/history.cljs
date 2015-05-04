@@ -30,7 +30,13 @@
    :patients/list   (fn []       (logic/set-current-page! :patients/list))
    :patients/show   (fn [params] (logic/set-current-page! :patients/show params))
    :patients/edit   (fn [params] (logic/set-current-page! :patients/edit params))
-   :patients/create (fn [params] (logic/set-current-page! :patients/create params))})
+   :patients/create (fn [params] (logic/set-current-page! :patients/create params))
+
+   :medicines/list   (fn []       (logic/set-current-page! :medicines/list))
+   :medicines/show   (fn [params] (logic/set-current-page! :medicines/show params))
+   :medicines/edit   (fn [params] (logic/set-current-page! :medicines/edit params))
+   :medicines/create (fn [params] (logic/set-current-page! :medicines/create params))
+   })
 
 ;;
 

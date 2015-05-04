@@ -20,11 +20,6 @@
   [:span (:street-name patient) " " (:house-number patient) "/" (:flat-number patient) [:br]
          (:zip-code patient) " " (:city patient) ", " (:country patient)])
 
-(defn key-for [entity]
-  (let [class (str/dasherize (last (str/split (:class entity) ".")))
-        id    (:id entity)]
-    (str class ":" id)))
-
 (defn patient-list-component []
   (let [patients (reagent/atom [])]
     (api/list-patients {} (fn [result] (match result
@@ -41,7 +36,7 @@
                                                 [:th "Address"]
                                                 [:th {:style {:width "200px"}} "Actions"]]
                                     (doall (for [patient @patients]
-                                             ^{:key (key-for patient)}
+                                             ^{:key (ui-utils/key-for patient)}
                                              [:tr [:td (:firstname patient)]
                                                   [:td (:surname patient)]
                                                   [:td (:personal-id patient)]
@@ -99,7 +94,6 @@
    :city           ""
    :country        ""
    })
-
 
 (defn patient-create-form-component []
   (let [patient (reagent/atom empty-patient)

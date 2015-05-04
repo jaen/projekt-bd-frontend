@@ -11,6 +11,7 @@
             [medisoft.frontend.ui.dashboard :as dashboard]
             [medisoft.frontend.ui.job-titles :as job-titles]
             [medisoft.frontend.ui.employees :as employees]
+            [medisoft.frontend.ui.medicines :as medicines]
 
             [medisoft.frontend.log :as log]
             [medisoft.frontend.validations :as validations]
@@ -61,7 +62,8 @@
         [:ul.nav.navbar-nav.navbar-right
           [:li [:a {:href (routes/app-path-for :job-titles/list)} "Job Titles"]]
           [:li [:a {:href (routes/app-path-for :employees/list)} "Employees"]]
-          [:li [:a {:href (routes/app-path-for :patients/list)} "Patients"]]])]]])
+          [:li [:a {:href (routes/app-path-for :patients/list)} "Patients"]]
+          [:li [:a {:href (routes/app-path-for :medicines/list)} "Medicines"]]])]]])
 
 (defn main-component []
   [:div.container {:style {:flex "1 1 0px" :padding "70px 0px 20px 0px"}}
@@ -82,7 +84,13 @@
             :patients/list   [patients/patient-list-component]
             :patients/show   [patients/patient-show-component]
             :patients/create [patients/patient-create-form-component]
-            :patients/edit   [patients/patient-edit-form-component])
+            :patients/edit   [patients/patient-edit-form-component]
+
+            :medicines/list  [medicines/medicine-list-component]
+            :medicines/show  [medicines/medicine-show-component]
+            :medicines/create [medicines/medicine-create-form-component]
+            :medicines/edit   [medicines/medicine-edit-form-component]
+            )
      [dashboard/dashboard-component])])
 
 (defn footer-component []
@@ -97,7 +105,7 @@
     [rc-core/v-box :padding "10px"
                    :children [[:h2 "Please log in"]
                               [form-input :login]
-                              [form-input :password]
+                              [form-input :password {:type :password}]
 
                               [rc-core/line :style {:margin "0 0 15px"}]
 
@@ -117,22 +125,27 @@
         form-processing? (reagent/atom false)
         on-cancel        #(reset! show-login-dialog? false)
         on-submit        (fn []
-                           (log/debug "form values" @form-data)
                            (let [validation-errors (validations/login-form @form-data)]
                              (reset! form-errors validation-errors)
                              (when-not validation-errors
                                (reset! form-processing? true)
-                               (api/log-in @form-data
+                               (api/validate-log-in @form-data
                                            (fn [result]
                                              (match result
-                                                    [:success response] (do
-                                                                          (reset! form-processing? false)
-                                                                          (reset! show-login-dialog? false)
-                                                                          (api/set-api-token! (:access-token response))
-                                                                          #_(reset! logged-in? true))
-                                                    [:error   {:errors errors}] (do
-                                                                                  (reset! form-errors errors)
-                                                                                  (reset! form-processing? false))))))))]
+                                                    [:success _] (api/log-in @form-data
+                                                                             (fn [result']
+                                                                               (match result'
+                                                                                      [:success response'] (do
+                                                                                                            (reset! form-processing? false)
+                                                                                                            (reset! show-login-dialog? false)
+                                                                                                            (api/set-api-token! (:access-token response'))
+                                                                                                            #_(reset! logged-in? true))
+                                                                                      [:error   {:errors errors'}] (do
+                                                                                                                    (reset! form-errors errors')
+                                                                                                                    (reset! form-processing? false)))))
+                                                    [:error {:response errors}] (do
+                                                                      (reset! form-errors (clojure.set/rename-keys errors {:username :login}))
+                                                                      (reset! form-processing? false))))))))]
     [ui-utils/loading-component form-processing? [login-fields-component form-data {:errors form-errors
                                                                                     :on-cancel on-cancel
                                                                                     :on-submit on-submit}]]))

@@ -64,13 +64,28 @@
                                      :style {:padding-top "10px"}
                                      :class "text-danger"])]])
 
-(defmethod form-field-component :select [name' {:keys [data errors choices model on-change] :as opts}]
+(defmethod form-field-component :password [name' {:keys [data errors] :as opts}]
+  [rc-core/v-box :class    "form-group"
+   :children [[:label #_{:for "login-form-login"} (labelize name')]
+              [rc-core/input-text :model (or (get @data name') "")
+               :on-change   #(swap! data assoc name' %)
+               ;:placeholder "Enter login"
+               :class       "form-control"
+               :width "100%"
+               :status      (when (get @errors name') :error)
+               :attr        {:type :password}
+               ]
+              (when (name' @errors) [rc-core/label :label (str/join ", " (name' @errors))
+                                     :style {:padding-top "10px"}
+                                     :class "text-danger"])]])
+
+(defmethod form-field-component :select [name' {:keys [data errors choices model on-change label-fn] :as opts}]
   [rc-core/v-box :class    "form-group"
    :children [[:label #_{:for "login-form-login"} (labelize name')]
               [dropdown/single-dropdown :choices choices
                                         :model   (or model (get @data name') "")
                                         :class   (str/join " " [(when (get @errors name') "has-error")])
-                                        :label-fn (fn [choice] (:name choice))
+                                        :label-fn (or label-fn #(:label %)) ; (fn [choice] (:name choice))
                                         :width "100%"
                                         :filter-box? true
                                         :on-change (or on-change #(swap! data assoc name' %))]

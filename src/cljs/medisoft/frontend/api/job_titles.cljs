@@ -1,4 +1,5 @@
 (ns medisoft.frontend.api.job-titles
+  (:refer-clojure :exclude [list get update])
   (:require [medisoft.frontend.api.core :as core]
             [medisoft.frontend.routes :as routes]
             [medisoft.frontend.log :as log]

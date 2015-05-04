@@ -147,7 +147,7 @@
         format                      {:format :json ;(ajax/transit-request-format {:handlers transit-utils/transit-write-handlers})
                                      :response-format :json
                                      :keywords? false} ;(ajax/detect-response-format {:response-format my-default-formats})}
-        original-params             (:params opts)
+        original-params             (or (:params opts) {})
         ;params                      {:params (map->api-request original-params)}
         api-opts                    (merge (merge-with merge (dissoc opts :schema) auth-headers)
                                            handlers format)]

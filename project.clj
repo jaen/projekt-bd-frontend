@@ -10,7 +10,7 @@
 
   :min-lein-version "2.5.1"
 
-  :dependencies [[org.clojure/clojure "1.7.0-beta1"]
+  :dependencies [[org.clojure/clojure "1.7.0-beta2"]
                  [org.clojure/clojurescript "0.0-3196"]
                  ;[org.clojure/clojurescript "0.0-3126"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
@@ -20,7 +20,7 @@
                   ; [http-kit "2.1.19"]
                   [org.immutant/web "2.0.0"]
                   [ronda/routing "0.2.5"]
-                  [bidi "1.18.9"]
+                  [bidi "1.18.10"]
                   [ronda/routing-bidi "0.1.1"]
                   [ronda/routing-schema "0.1.2"]
                   [optimus "0.17.1"]

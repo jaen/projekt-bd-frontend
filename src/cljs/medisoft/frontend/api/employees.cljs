@@ -1,4 +1,5 @@
 (ns medisoft.frontend.api.employees
+  (:refer-clojure :exclude [list get update])
   (:require [medisoft.frontend.api.core :as core]
             [medisoft.frontend.routes :as routes]
             [medisoft.frontend.log :as log]
@@ -10,8 +11,7 @@
   (core/api-call :get
                  (routes/server-path-for :api.employees/list)
                  {:params      {}
-                  :schema      {:request  schemas/EmployeeListQuery
-                                :response schemas/EmployeeListResponse}
+                  :schema      {:response schemas/EmployeeListResponse}
                   :response-fn callback}))
 
 (defn get [{:keys [id]} callback]

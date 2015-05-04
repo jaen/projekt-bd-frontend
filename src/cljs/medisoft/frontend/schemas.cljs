@@ -31,6 +31,14 @@
    :roles [schema/Str]
    :access-token schema/Str})
 
+(def LoginValidateRequest
+  {:username schema/Str
+   :password schema/Str})
+
+(def LoginValidateResponse
+  {(schema/optional-key :username) [schema/Str]
+   (schema/optional-key :password) [schema/Str]})
+
 ;; common schemas
 
 (def EntityId
@@ -153,3 +161,37 @@
 
 (def PatientUpdateResponse
   PatientCreateResponse)
+
+;; medicine schemas
+
+(def MedicineAttributes
+  {:approved schema/Bool
+   :dose schema/Str
+   :gtin schema/Str
+   :name schema/Str
+   :producer-name schema/Str
+   :type schema/Str
+   :wrapping schema/Str})
+
+(def Medicine
+  (merge EntityReference
+         MedicineAttributes))
+
+(def MedicineListResponse
+  [Medicine])
+
+(def MedicineShowResponse
+  Medicine)
+
+(def MedicineCreateRequest
+  MedicineAttributes)
+
+(def MedicineCreateResponse
+  (schema/either Medicine
+                 (errors-response MedicineCreateRequest)))
+
+(def MedicineUpdateRequest
+  MedicineCreateRequest)
+
+(def MedicineUpdateResponse
+  MedicineCreateResponse)
