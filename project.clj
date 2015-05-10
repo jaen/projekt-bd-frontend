@@ -15,6 +15,7 @@
                  ;[org.clojure/clojurescript "0.0-3126"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [org.clojure/core.match "0.3.0-alpha4"]
+                 [environ "1.0.0"]
 
                   ; mock client
                   ; [http-kit "2.1.19"]
@@ -70,10 +71,16 @@
                              :compiler {:output-to     "resources/public/assets/javascripts/application/development.js"
                                         :output-dir    "resources/public/assets/javascripts/application/out/development"
                                         :asset-path    "/assets/javascripts/application/out/development"
-                                        :externs       ["externs/material-ui-externs.js"]
                                         :optimizations :none
                                         :pretty-print  true
-                                        :source-map    true}}}}
+                                        :source-map    true}}
+                      :staging {:source-paths ["src/cljs" "target/generated/cljs" "env/staging/cljs"]
+                                :compiler {:main          "medisoft.frontend.main"
+                                           :output-to     "resources/public/assets/javascripts/application/staging.js"
+                                           :output-dir    "resources/public/assets/javascripts/application/out/staging"
+                                           :asset-path    "/assets/javascripts/application/out/staging"
+                                           :optimizations :advanced
+                                           :pretty-print  false}}}}
 
   :profiles {:dev {:dependencies [[org.clojure/core.typed "0.2.84"]
                                   [ring-mock "0.1.5"]
@@ -121,7 +128,7 @@
                                     :rules :cljs}]}
 
                    :cljsbuild {:builds {:dev {:source-paths ["env/dev/cljs"]
-                                              :compiler {:main "medisoft.frontend.dev"
+                                              :compiler {:main "medisoft.frontend.main"
                                                          :source-map true}}
                                         :test {:source-paths ["src/cljs"  "target/generated/cljs" "test/cljs"]
                                                :compiler {:output-to "target/test.js"

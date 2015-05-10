@@ -27,7 +27,10 @@
 
 ;; server side routing
 
-(def base-address "//localhost:8080/mediApp")
+;; TODO: this should not need exlicit path, that's dumb
+(def base-address (condp = medisoft.frontend.main/env
+                    :development "//localhost:8080/mediApp"
+                    :staging     "//46.101.191.238:8080/mediApp"))
 
 (def server-routes ["/" [["explicit/login" :api.authentication/validate-log-in]
                          ["api/" [["login"  :api.authentication/log-in]

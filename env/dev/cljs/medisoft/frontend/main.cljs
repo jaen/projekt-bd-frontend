@@ -1,7 +1,9 @@
-(ns ^:figwheel-no-load medisoft.frontend.dev
+(ns ^:figwheel-no-load medisoft.frontend.main
   (:require [medisoft.frontend.core :as core]
             [figwheel.client :as figwheel :include-macros true]
             [weasel.repl :as weasel]))
+
+(def env :development)
 
 (enable-console-print!)
 

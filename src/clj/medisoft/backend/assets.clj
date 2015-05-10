@@ -6,6 +6,7 @@
             [ring.middleware.content-type :as content-type]
             [ring.middleware.not-modified :as not-modified]
             [taoensso.timbre :as timbre]
+            [environ.core :as env]
             [clojure.pprint :refer (pprint)]))
 
 (defn- make-assets-configuration [config]
@@ -16,21 +17,15 @@
                           (assets/load-bundle "public" resource-name assets))) config)]
       (apply concat resource-map))))
 
-(defn make-config-for-env []
-  {"application.css" ["/assets/stylesheets/application.css"]
-   ; "material-ui.js"  ["/assets/javascripts/material-ui.js"]
-   "application.js"  ["/assets/javascripts/application/development.js"]
-   :assets           ["/assets/stylesheets/application.css.map"
-                      #"/assets/sass/.+\.scss"
-                      #"/assets/javascripts/application/out/development/.+\.(js|cljs|js\.map)"]}
-  #_{"application.css"   [#"/assets/stylesheets/.+\.css"]
-                          "application.scss"  [#"/assets/sass/.+\.scss"]
-                          "application.js"    [;"/assets/javascripts/bowser.js"
-                                               "/assets/javascripts/resize-sensor.js"
-                                               "/assets/javascripts/application-development.js"]
-                          :assets             [#"/assets/javascripts/cljs-out/development/.+\.(js|cljs|js\.map)"
-                                               #"/assets/fonts/.+"
-                                               #"/assets/images/.+"]})
+(defn make-config-for-env [env]
+  (condp = env
+    :development {"application.css" ["/assets/stylesheets/application.css"]
+                  "application.js"  ["/assets/javascripts/application/development.js"]
+                  :assets           ["/assets/stylesheets/application.css.map"
+                                     #"/assets/sass/.+\.scss"
+                                     #"/assets/javascripts/application/out/development/.+\.(js|cljs|js\.map)"]}
+    :staging     {"application.css" ["/assets/stylesheets/application.css"]
+                  "application.js"  ["/assets/javascripts/application/staging.js"]}))
 
 (defn optimise-without-js [assets options]
   (-> assets
@@ -42,8 +37,9 @@
       (optimizations/add-last-modified-headers)))
 
 (defn create-assets-middleware []
-  (let [environment          :development
-        optimus-asset-config (make-assets-configuration (make-config-for-env))]
+  (let [environment          (or (keyword (env/env :env))
+                                 :development)
+        optimus-asset-config (make-assets-configuration (make-config-for-env environment))]
     (timbre/info "asset-config: " optimus-asset-config)
 
     (comp
@@ -55,11 +51,11 @@
         optimus-asset-config
         (condp = environment
           :development optimizations/none
-          :staging optimise-without-js
-          :production optimizations/all)
+          :staging     optimise-without-js
+          :production  optimizations/all)
         (condp = environment
           :development strategies/serve-live-assets
-          :staging strategies/serve-frozen-assets
-          :production strategies/serve-frozen-assets)
-        :cache-live-assets 5000
-        :uglify-js {:mangle-names false}))))
+          :staging     strategies/serve-frozen-assets
+          :production  strategies/serve-frozen-assets)
+        {:cache-live-assets 5000
+         :uglify-js {:mangle-names false}}))))
