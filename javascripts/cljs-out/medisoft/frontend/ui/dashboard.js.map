@@ -1,0 +1,12 @@
+{"version":3,
+ "file":
+ "/home/jaen/projects/projekt-bb-frontend/javascripts/cljs-out/medisoft/frontend/ui/dashboard.js",
+ "sources":["dashboard.cljs"],
+ "lineCount":13,
+ "mappings":
+ ";AAAA;;;;AAGA,+CAAA,0BAAA,AAAA,0GAAA,qDAAA,QAAA,sDAAA,tSAAMA,mKACHC;;AAEH,mDAAA,8BAAA,AAAA,0GAAA,sDAAA,jPAAMC,2KACHD;;AAEH,qDAAA,gCAAA,AAAA,4GAAA,qDAAA,IAAA,6DAAA,mFAAA,qGAAA,qDAAA,IAAA,6DAAA,mFAAA,wIAAA,h0BAAME,+KACHC,8SACYC,8SACYL,wIACAE",
+ "names":
+ ["medisoft.frontend.ui.dashboard/nav-component", "re-com.core/box",
+  "medisoft.frontend.ui.dashboard/content-component",
+  "medisoft.frontend.ui.dashboard/dashboard-component",
+  "re-com.core/v-box", "re-com.core/h-box"]}

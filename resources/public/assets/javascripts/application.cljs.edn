@@ -1,0 +1,2 @@
+{:require [medisoft.frontend.main medisoft.frontend.core]
+ :init-fns [medisoft.frontend.core/init!]}

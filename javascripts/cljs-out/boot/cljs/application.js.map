@@ -1,0 +1,7 @@
+{"version":3,
+ "file":
+ "/home/jaen/projects/projekt-bb-frontend/javascripts/cljs-out/boot/cljs/application.js",
+ "sources":["application.cljs"],
+ "lineCount":9,
+ "mappings":";AAAA;;;;;AAEA,AAAI,AAACA",
+ "names":["medisoft.frontend.core/init!"]}

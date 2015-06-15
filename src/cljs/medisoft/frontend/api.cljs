@@ -4,6 +4,8 @@
             [medisoft.frontend.api.employees :as employees]
             [medisoft.frontend.api.patients :as patients]
             [medisoft.frontend.api.medicines :as medicines]
+            [medisoft.frontend.api.appointments :as appointments]
+
             [medisoft.frontend.routes :as routes]
             [medisoft.frontend.log :as log]
             [medisoft.frontend.schemas :as schemas]))
@@ -62,3 +64,10 @@
 (def get-medicine    medicines/get)
 (def create-medicine medicines/create)
 (def update-medicine medicines/update)
+
+;; appointments API
+
+(def list-appointments  appointments/list)
+(def get-appointment    appointments/get)
+(def create-appointment appointments/create)
+(def update-appointment appointments/update)

@@ -12,7 +12,9 @@
             [medisoft.frontend.ui.job-titles :as job-titles]
             [medisoft.frontend.ui.employees :as employees]
             [medisoft.frontend.ui.medicines :as medicines]
+            [medisoft.frontend.ui.appointments :as appointments]
 
+            [medisoft.frontend.l18n :as l18n]
             [medisoft.frontend.log :as log]
             [medisoft.frontend.validations :as validations]
             [medisoft.frontend.routes :as routes]
@@ -47,9 +49,9 @@
 (defn user-component []
   (if @api/logged-in?
     [:ul.nav.navbar-nav.navbar-right
-     [:li.navbar-text "Logged in"]
+     [:li.navbar-text (l18n/t :common/logged-in)]
      [dropdown-menu-component]]
-    [:a.btn.btn-info.navbar-btn.navbar-right {:on-click (fn [e] (reset! show-login-dialog? true) (.preventDefault e))} "Log in"]))
+    [:a.btn.btn-info.navbar-btn.navbar-right {:on-click (fn [e] (reset! show-login-dialog? true) (.preventDefault e))} (l18n/t :common/do-log-in)]))
 
 (defn header-component []
   [:nav.navbar.navbar-inverse.navbar-fixed-top
@@ -60,10 +62,11 @@
      [user-component]
       (when @api/logged-in?
         [:ul.nav.navbar-nav.navbar-right
-          [:li [:a {:href (routes/app-path-for :job-titles/list)} "Job Titles"]]
-          [:li [:a {:href (routes/app-path-for :employees/list)} "Employees"]]
-          [:li [:a {:href (routes/app-path-for :patients/list)} "Patients"]]
-          [:li [:a {:href (routes/app-path-for :medicines/list)} "Medicines"]]])]]])
+          [:li [:a {:href (routes/app-path-for :job-titles/list)}   (l18n/t :header/job-titles)]]
+          [:li [:a {:href (routes/app-path-for :employees/list)}    (l18n/t :header/employees)]]
+          [:li [:a {:href (routes/app-path-for :patients/list)}     (l18n/t :header/patients)]]
+          [:li [:a {:href (routes/app-path-for :medicines/list)}    (l18n/t :header/medicines)]]
+          [:li [:a {:href (routes/app-path-for :appointments/list)} (l18n/t :header/appointments)]]])]]])
 
 (defn main-component []
   [:div.container {:style {:flex "1 1 0px" :padding "70px 0px 20px 0px"}}
@@ -90,7 +93,11 @@
             :medicines/show  [medicines/medicine-show-component]
             :medicines/create [medicines/medicine-create-form-component]
             :medicines/edit   [medicines/medicine-edit-form-component]
-            )
+
+            :appointments/list  [appointments/appointment-list-component]
+            :appointments/show  [appointments/appointment-show-component]
+            :appointments/create [appointments/appointment-create-form-component]
+            :appointments/edit   [appointments/appointment-edit-form-component])
      [dashboard/dashboard-component])])
 
 (defn footer-component []
@@ -100,22 +107,21 @@
   #_[rc-core/h-box :children ["Footer"]])
 
 (defn login-fields-component [form-data & [{:keys [errors] :as options}]]
-  (log/debug "options:" options)
   (let [form-input (ui-utils/make-form-field-maker form-data errors)]
     [rc-core/v-box :padding "10px"
-                   :children [[:h2 "Please log in"]
-                              [form-input :login]
-                              [form-input :password {:type :password}]
+                   :children [[:h2 (l18n/t :login-form/header)]
+                              [form-input :login {:label (l18n/t :common/login)}]
+                              [form-input :password {:type :password :label (l18n/t :common/password)}]
 
                               [rc-core/line :style {:margin "0 0 15px"}]
 
                               [rc-core/h-box :class    "actions"
                                              :gap      "12px"
-                                             :children [[rc-core/button :label "Log in"
+                                             :children [[rc-core/button :label (l18n/t :common/do-log-in)
                                                                         :style {:flex "1"}
                                                                         :class "btn-primary"
                                                                         :on-click (:on-submit options)]
-                                                        [rc-core/button :label "Cancel"
+                                                        [rc-core/button :label (l18n/t :common/cancel)
                                                                         :class "btn-danger"
                                                                         :on-click (:on-cancel options)]]]]]))
 

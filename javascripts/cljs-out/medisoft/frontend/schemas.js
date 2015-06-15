@@ -1,0 +1,63 @@
+// Compiled by ClojureScript 0.0-2371
+goog.provide('medisoft.frontend.schemas');
+goog.require('cljs.core');
+goog.require('schema.core');
+goog.require('schema.core');
+goog.require('medisoft.frontend.log');
+goog.require('medisoft.frontend.log');
+medisoft.frontend.schemas.wrap_optional_key = (function wrap_optional_key(key){if((key instanceof schema.core.OptionalKey))
+{return key;
+} else
+{return schema.core.optional_key.call(null,key);
+}
+});
+medisoft.frontend.schemas.make_all_keys_optional = (function make_all_keys_optional(schema__$1){return cljs.core.into.call(null,cljs.core.PersistentArrayMap.EMPTY,cljs.core.map.call(null,(function (p__16232){var vec__16233 = p__16232;var k = cljs.core.nth.call(null,vec__16233,(0),null);var v = cljs.core.nth.call(null,vec__16233,(1),null);return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.wrap_optional_key.call(null,k),v], null);
+}),schema__$1));
+});
+medisoft.frontend.schemas.errors_response = (function errors_response(schema__$1){return new cljs.core.PersistentArrayMap.fromArray([schema.core.optional_key.call(null,new cljs.core.Keyword(null,"valid","valid",155614240)),schema.core.Bool,new cljs.core.Keyword(null,"errors","errors",-908790718),cljs.core.into.call(null,cljs.core.PersistentArrayMap.EMPTY,cljs.core.map.call(null,(function (p__16236){var vec__16237 = p__16236;var k = cljs.core.nth.call(null,vec__16237,(0),null);var _ = cljs.core.nth.call(null,vec__16237,(1),null);return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.wrap_optional_key.call(null,k),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [schema.core.Str], null)], null);
+}),schema__$1))], true, false);
+});
+medisoft.frontend.schemas.DateTime = schema.core.pred.call(null,(function (val){return cljs.core.some.call(null,(function (p1__16238_SHARP_){return (val instanceof p1__16238_SHARP_);
+}),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [goog.date.Date,goog.date.DateTime,goog.date.UtcDateTime], null));
+}),new cljs.core.Symbol(null,"date-time?","date-time?",501421145,null));
+medisoft.frontend.schemas.LoginRequest = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"username","username",1605666410),schema.core.Str,new cljs.core.Keyword(null,"password","password",417022471),schema.core.Str], null);
+medisoft.frontend.schemas.LoginResponse = new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"username","username",1605666410),schema.core.Str,new cljs.core.Keyword(null,"roles","roles",143379530),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [schema.core.Str], null),new cljs.core.Keyword(null,"access-token","access-token",-654201199),schema.core.Str], null);
+medisoft.frontend.schemas.LoginValidateRequest = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"username","username",1605666410),schema.core.Str,new cljs.core.Keyword(null,"password","password",417022471),schema.core.Str], null);
+medisoft.frontend.schemas.LoginValidateResponse = new cljs.core.PersistentArrayMap.fromArray([schema.core.optional_key.call(null,new cljs.core.Keyword(null,"username","username",1605666410)),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [schema.core.Str], null),schema.core.optional_key.call(null,new cljs.core.Keyword(null,"password","password",417022471)),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [schema.core.Str], null)], true, false);
+medisoft.frontend.schemas.EntityId = schema.core.Int;
+medisoft.frontend.schemas.EntityReference = new cljs.core.PersistentArrayMap.fromArray([schema.core.optional_key.call(null,new cljs.core.Keyword(null,"class","class",-2030961996)),schema.core.Str,new cljs.core.Keyword(null,"id","id",-1388402092),medisoft.frontend.schemas.EntityId], true, false);
+medisoft.frontend.schemas.PersonalId = schema.core.Str;
+medisoft.frontend.schemas.ZipCode = schema.core.Str;
+medisoft.frontend.schemas.PersonalInformation = cljs.core.PersistentHashMap.fromArrays([new cljs.core.Keyword(null,"city","city",-393302614),new cljs.core.Keyword(null,"surname","surname",1407918027),new cljs.core.Keyword(null,"flat-number","flat-number",80119180),new cljs.core.Keyword(null,"firstname","firstname",1659984849),new cljs.core.Keyword(null,"zip-code","zip-code",884340280),new cljs.core.Keyword(null,"street-name","street-name",-67507047),new cljs.core.Keyword(null,"house-number","house-number",30291003),new cljs.core.Keyword(null,"country","country",312965309),new cljs.core.Keyword(null,"personal-id","personal-id",743022525)],[schema.core.Str,schema.core.Str,schema.core.Str,schema.core.Str,medisoft.frontend.schemas.ZipCode,schema.core.Str,schema.core.Str,schema.core.Str,medisoft.frontend.schemas.PersonalId]);
+medisoft.frontend.schemas.JobTitle = cljs.core.merge.call(null,medisoft.frontend.schemas.EntityReference,new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"name","name",1843675177),schema.core.Str], null));
+medisoft.frontend.schemas.JobTitleListResponse = new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.JobTitle], null);
+medisoft.frontend.schemas.JobTitleShowResponse = medisoft.frontend.schemas.JobTitle;
+medisoft.frontend.schemas.JobTitleCreateRequest = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"name","name",1843675177),schema.core.Str], null);
+medisoft.frontend.schemas.JobTitleCreateResponse = schema.core.either.call(null,medisoft.frontend.schemas.JobTitle,medisoft.frontend.schemas.errors_response.call(null,medisoft.frontend.schemas.JobTitleCreateRequest));
+medisoft.frontend.schemas.JobTitleUpdateRequest = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"name","name",1843675177),schema.core.Str], null);
+medisoft.frontend.schemas.JobTitleUpdateResponse = medisoft.frontend.schemas.JobTitleCreateResponse;
+medisoft.frontend.schemas.Employee = cljs.core.merge.call(null,medisoft.frontend.schemas.EntityReference,medisoft.frontend.schemas.PersonalInformation,cljs.core.PersistentHashMap.fromArrays([new cljs.core.Keyword(null,"is-doctor","is-doctor",-443448735),new cljs.core.Keyword(null,"medical-visits","medical-visits",464178785),new cljs.core.Keyword(null,"prescriptions","prescriptions",-1006145213),new cljs.core.Keyword(null,"specializations","specializations",399139461),new cljs.core.Keyword(null,"job-title","job-title",1246185035),new cljs.core.Keyword(null,"device-reservations","device-reservations",1712958963),new cljs.core.Keyword(null,"room-reservations","room-reservations",1327072628),new cljs.core.Keyword(null,"schedules","schedules",2099585369),new cljs.core.Keyword(null,"users","users",-713552705)],[schema.core.Bool,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.EntityReference], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.EntityReference], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.EntityReference], null),medisoft.frontend.schemas.EntityReference,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.EntityReference], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.EntityReference], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.EntityReference], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.EntityReference], null)]));
+medisoft.frontend.schemas.EmployeeListResponse = new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.Employee], null);
+medisoft.frontend.schemas.EmployeeShowResponse = medisoft.frontend.schemas.Employee;
+medisoft.frontend.schemas.EmployeeCreateRequest = cljs.core.merge.call(null,medisoft.frontend.schemas.PersonalInformation,new cljs.core.PersistentArrayMap.fromArray([new cljs.core.Keyword(null,"is-doctor","is-doctor",-443448735),schema.core.Bool,schema.core.optional_key.call(null,new cljs.core.Keyword(null,"job-title","job-title",1246185035)),medisoft.frontend.schemas.EntityReference,schema.core.optional_key.call(null,new cljs.core.Keyword(null,"user","user",1532431356)),medisoft.frontend.schemas.EntityReference,schema.core.optional_key.call(null,new cljs.core.Keyword(null,"specialization","specialization",622834445)),medisoft.frontend.schemas.EntityReference], true, false));
+medisoft.frontend.schemas.EmployeeCreateResponse = schema.core.either.call(null,medisoft.frontend.schemas.Employee,medisoft.frontend.schemas.errors_response.call(null,medisoft.frontend.schemas.EmployeeCreateRequest));
+medisoft.frontend.schemas.EmployeeUpdateRequest = cljs.core.merge.call(null,medisoft.frontend.schemas.EmployeeCreateRequest);
+medisoft.frontend.schemas.EmployeeUpdateResponse = medisoft.frontend.schemas.EmployeeCreateResponse;
+medisoft.frontend.schemas.Patient = cljs.core.merge.call(null,medisoft.frontend.schemas.EntityReference,medisoft.frontend.schemas.PersonalInformation,new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"medical-visits","medical-visits",464178785),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.EntityReference], null),new cljs.core.Keyword(null,"prescription","prescription",1561873972),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.EntityReference], null)], null));
+medisoft.frontend.schemas.PatientListQuery = new cljs.core.PersistentArrayMap.fromArray([schema.core.optional_key.call(null,new cljs.core.Keyword(null,"firstname","firstname",1659984849)),schema.core.Str,schema.core.optional_key.call(null,new cljs.core.Keyword(null,"surname","surname",1407918027)),schema.core.Str,schema.core.optional_key.call(null,new cljs.core.Keyword(null,"personal-id","personal-id",743022525)),schema.core.Str], true, false);
+medisoft.frontend.schemas.PatientListResponse = new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.Patient], null);
+medisoft.frontend.schemas.PatientShowResponse = medisoft.frontend.schemas.Patient;
+medisoft.frontend.schemas.PatientCreateRequest = medisoft.frontend.schemas.PersonalInformation;
+medisoft.frontend.schemas.PatientCreateResponse = schema.core.either.call(null,medisoft.frontend.schemas.Patient,medisoft.frontend.schemas.errors_response.call(null,medisoft.frontend.schemas.PatientCreateRequest));
+medisoft.frontend.schemas.PatientUpdateRequest = cljs.core.merge.call(null,medisoft.frontend.schemas.PersonalInformation);
+medisoft.frontend.schemas.PatientUpdateResponse = medisoft.frontend.schemas.PatientCreateResponse;
+medisoft.frontend.schemas.MedicineAttributes = new cljs.core.PersistentArrayMap(null, 7, [new cljs.core.Keyword(null,"approved","approved",-803187124),schema.core.Bool,new cljs.core.Keyword(null,"dose","dose",-1241257813),schema.core.Str,new cljs.core.Keyword(null,"gtin","gtin",-1651547591),schema.core.Str,new cljs.core.Keyword(null,"name","name",1843675177),schema.core.Str,new cljs.core.Keyword(null,"producer-name","producer-name",-1458815353),schema.core.Str,new cljs.core.Keyword(null,"type","type",1174270348),schema.core.Str,new cljs.core.Keyword(null,"wrapping","wrapping",-1252305316),schema.core.Str], null);
+medisoft.frontend.schemas.Medicine = cljs.core.merge.call(null,medisoft.frontend.schemas.EntityReference,medisoft.frontend.schemas.MedicineAttributes);
+medisoft.frontend.schemas.MedicineListResponse = new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [medisoft.frontend.schemas.Medicine], null);
+medisoft.frontend.schemas.MedicineShowResponse = medisoft.frontend.schemas.Medicine;
+medisoft.frontend.schemas.MedicineCreateRequest = medisoft.frontend.schemas.MedicineAttributes;
+medisoft.frontend.schemas.MedicineCreateResponse = schema.core.either.call(null,medisoft.frontend.schemas.Medicine,medisoft.frontend.schemas.errors_response.call(null,medisoft.frontend.schemas.MedicineCreateRequest));
+medisoft.frontend.schemas.MedicineUpdateRequest = medisoft.frontend.schemas.MedicineCreateRequest;
+medisoft.frontend.schemas.MedicineUpdateResponse = medisoft.frontend.schemas.MedicineCreateResponse;
+
+//# sourceMappingURL=schemas.js.map

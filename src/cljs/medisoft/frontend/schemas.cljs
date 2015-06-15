@@ -48,6 +48,14 @@
   {(schema/optional-key :class) schema/Str
    :id    EntityId})
 
+(defn make-entity [schema]
+  (merge EntityReference schema)
+  #_(schema/either
+    {(schema/optional-key :class) schema/Str
+     :_ref   schema/Str}
+    EntityReference
+    (merge EntityReference schema)))
+
 (def PersonalId
   schema/Str)
 
@@ -93,8 +101,8 @@
 ;; employee schemas
 
 (def Employee
-  (merge EntityReference
-         PersonalInformation
+  (make-entity
+    (merge PersonalInformation
          {:is-doctor           schema/Bool
           :device-reservations [EntityReference]
           :room-reservations   [EntityReference]
@@ -103,7 +111,7 @@
           :prescriptions       [EntityReference]
           :schedules           [EntityReference]
           :specializations     [EntityReference]
-          :users               [EntityReference]}))
+          :users               [EntityReference]})))
 
 (def EmployeeListResponse
   [Employee])
@@ -131,11 +139,13 @@
 
 ;; patient schemas
 
+(declare Visit)
+
 (def Patient
-  (merge EntityReference
-         PersonalInformation
-         {:medical-visits      [EntityReference]
-          :prescription #_s       [EntityReference]}))
+  (make-entity
+    (merge PersonalInformation
+           {:medical-visits         [Visit]
+            (schema/optional-key :prescription)           [EntityReference]})))
 
 (def PatientListQuery
   {(schema/optional-key :firstname)   schema/Str
@@ -195,3 +205,41 @@
 
 (def MedicineUpdateResponse
   MedicineCreateResponse)
+
+;; visit schemas
+
+(def VisitAttributes
+  {:date        DateTime
+   :description schema/Str
+   :employee    EntityReference #_(schema/either EntityReference Employee)
+   :patient     EntityReference #_(schema/either EntityReference Patient)})
+
+(def VisitAdditionalAttributes
+  {:description                 (schema/maybe schema/Str)
+   (schema/optional-key :icd10) [schema/Str]
+   :employee    Employee
+   :patient     Patient})
+
+(def Visit
+  (merge EntityReference
+         VisitAttributes))
+
+(def VisitListResponse
+  [(merge Visit VisitAdditionalAttributes)])
+
+(def VisitShowResponse
+  (merge Visit VisitAdditionalAttributes))
+
+(def VisitCreateRequest
+  VisitAttributes)
+
+(def VisitCreateResponse
+  (schema/either Visit
+                 (errors-response VisitCreateRequest)))
+
+(def VisitUpdateRequest
+  (merge VisitAttributes VisitAdditionalAttributes))
+
+(def VisitUpdateResponse
+  (schema/either (merge Visit VisitAdditionalAttributes)
+                 (errors-response VisitCreateRequest)))

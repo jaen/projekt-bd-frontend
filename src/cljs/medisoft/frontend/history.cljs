@@ -36,6 +36,11 @@
    :medicines/show   (fn [params] (logic/set-current-page! :medicines/show params))
    :medicines/edit   (fn [params] (logic/set-current-page! :medicines/edit params))
    :medicines/create (fn [params] (logic/set-current-page! :medicines/create params))
+
+   :appointments/list   (fn []       (logic/set-current-page! :appointments/list))
+   :appointments/show   (fn [params] (logic/set-current-page! :appointments/show params))
+   :appointments/edit   (fn [params] (logic/set-current-page! :appointments/edit params))
+   :appointments/create (fn [params] (logic/set-current-page! :appointments/create params))
    })
 
 ;;

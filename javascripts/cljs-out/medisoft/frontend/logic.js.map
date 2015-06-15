@@ -1,0 +1,13 @@
+{"version":3,
+ "file":
+ "/home/jaen/projects/projekt-bb-frontend/javascripts/cljs-out/medisoft/frontend/logic.js",
+ "sources":["logic.cljs"],
+ "lineCount":43,
+ "mappings":
+ ";AAAA;;;;;;AAKA,GAAA,OAASA;CAAT;CAAA,AAAA,AAASA,uCAAe,4BAAA,5BAACC;;AACzB,GAAA,OAASC;CAAT;CAAA,AAAA,AAASA,yCAAe,4BAAA,5BAACD;;AAEzB;;;iDAAA,jDAAMK;sDAANH,UAAA,AAAA,IAAAC,aAAAD,sBAAA,AAAAE,wBAAAD,WAAA,IAAA,MAAA,nGAAyBG,6CAAQC,sDAC/B,sCAAA,tCAACC,sDAA4B,AAACC,gCAAOV,qCAAaO;AAClD,6CAAA,tCAACE,wDAA4B,AAACC,gCAAOR,uCAAe,iBAAAS,0BAAA,AAAA,oBAAAA,3BAAIH;CAAJG;;CAAA;;;;uCAF7BJ;IAAzBJ;EAAAA;uDAAAA,LAAyBI;;;IAAAA;IAAzBJ;6CAAAA,LAAyBI",
+ "names":
+ ["medisoft.frontend.logic/current-page", "reagent.core/atom",
+  "medisoft.frontend.logic/current-params", "p__16220", "vec__16222",
+  "cljs.core/nth", "medisoft.frontend.logic/set-current-page!", "page",
+  "params", "medisoft.frontend.log/debug", "cljs.core/reset!",
+  "or__3607__auto__"]}

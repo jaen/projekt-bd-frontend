@@ -1,0 +1,13 @@
+{"version":3,
+ "file":
+ "/home/jaen/projects/projekt-bb-frontend/javascripts/cljs-out/medisoft/frontend/log.js",
+ "sources":["log.cljs"],
+ "lineCount":106,
+ "mappings":
+ ";AAAA;;;;;;AAKA,qCAAA,yBAAA,AAAA,9DAAOA;;AAGP;;;8BAAA,9BAAMC;sCAAN,NAAeC,MACb,6DAAA,zDAAMC,WAAS,AAACH,8CACd,OAAQ,SAAA,RAAMI,wBAAoBA,QAAW,AAACC,+BAAW,AAACC,yBAAKH,SAASD;;;IAF7DA;EAAAA;iCAAAA;;;IAAAA;uBAAAA;;;;;;AAIf;;;8BAAA,9BAAMK;sCAAN,NAAeL,MACb,6DAAA,zDAAMC,WAAS,AAACH,8CACd,OAAQ,SAAA,RAAMI,wBAAoBA,QAAW,AAACC,+BAAW,AAACC,yBAAKH,SAASD;;;IAF7DA;EAAAA;iCAAAA;;;IAAAA;uBAAAA;;;;;;AAIf;;;6BAAA,7BAAMM;qCAAN,NAAcN,MACZ,6DAAA,zDAAMC,WAAS,AAACH,8CACd,OAAQ,SAAA,RAAMI,sBAAkBA,QAAW,AAACC,+BAAW,AAACC,yBAAKH,SAASD;;;IAF5DA;EAAAA;gCAAAA;;;IAAAA;sBAAAA;;;;;;AAId;;;6BAAA,7BAAMO;qCAAN,NAAcP,MACZ,6DAAA,zDAAMC,WAAS,AAACH,8CACd,OAAQ,SAAA,RAAMI,uBAAmBA,QAAW,AAACC,+BAAW,AAACC,yBAAKH,SAASD;;;IAF7DA;EAAAA;gCAAAA;;;IAAAA;sBAAAA;;;;;;AAId;;;8BAAA,9BAAMQ;sCAAN,NAAeR,MACb,6DAAA,zDAAMC,WAAS,AAACH,8CACd,OAAQ,SAAA,RAAMI,wBAAoBA,QAAW,AAACC,+BAAW,AAACC,yBAAKH,SAASD;;;IAF7DA;EAAAA;iCAAAA;;;IAAAA;uBAAAA",
+ "names":
+ ["medisoft.frontend.log/get-preamble", "medisoft.frontend.log/trace",
+  "args", "preamble", "js/console", "cljs.core/into-array",
+  "cljs.core/cons", "medisoft.frontend.log/debug",
+  "medisoft.frontend.log/info", "medisoft.frontend.log/warn",
+  "medisoft.frontend.log/error"]}

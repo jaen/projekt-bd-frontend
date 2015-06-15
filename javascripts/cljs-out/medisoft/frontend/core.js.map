@@ -1,0 +1,18 @@
+{"version":3,
+ "file":
+ "/home/jaen/projects/projekt-bb-frontend/javascripts/cljs-out/medisoft/frontend/core.js",
+ "sources":["core.cljs"],
+ "lineCount":36,
+ "mappings":
+ ";AAAA;;;;;;;;;;;;AAQA,gDAAA,mCAAA,nFAAMA,mFACJ,OAACC;;AAEH,0CAAA,6BAAA,vEAAMC,uEACJ,+CAAA,xCAACC,2HAA0BC,+DAAsC,AAAQC;;AAE3E,GAAA,OAASC;CAAT;CAAA,AAAA,AAASA,qCAAY,yBAAA,zBAACC;;AAEtB,mDAAA,sCAAA,zFAAMC,yFACJ,oBAAA,AAAAC,0BAAWH;CAAX;CAAA,AAAuB,AAACI,gCAAOJ,mCAAY,AAAWK;;AACtD,IAAMC,mBAAiB,4CAAA,jCAAKC,UAAUC,IAAIC,KAAKC,OAAOC,OAC7B,sCAAA,oBAAA,SAAA,SAAA,WAAA,vFAACC,gDAAoBL,eAAeC,QAAQC,SAASC,YAAYC;AADnE;GAAvB,AAGE,OAAM,AAAWN,iBAAWC;;AAEhC,oCAAA,uBAAA,3DAAMO,2DACJ,AAACnB;AACD,AAACQ;AACD,AAACN;AACD,OAACkB,wDAAuB,AAAQf",
+ "names":
+ ["medisoft.frontend.core/install-devtools!", "devtools.core/install!",
+  "medisoft.frontend.core/mount-root!",
+  "reagent.core/render-component",
+  "medisoft.frontend.ui.application/application-component",
+  "js/document", "medisoft.frontend.core/old-handler",
+  "cljs.core/atom", "medisoft.frontend.core/setup-error-handler!",
+  "cljs.core/deref", "cljs.core/reset!", "js/window",
+  "on-error-handler", "error-msg", "url", "line", "column", "error",
+  "medisoft.frontend.log/error", "medisoft.frontend.core/init!",
+  "medisoft.frontend.history/setup-history!"]}

@@ -4,7 +4,6 @@
             [schema.core :as schema :include-macros true]
             [schema.coerce :as schema-coerce]
             [schema.utils :as schema-utils]
-            [clojure.walk :as walk]
             [cljs.core.match :refer-macros [match]]
             [ajax.core :as ajax]
             [hodgepodge.core :as hodgepodge]
@@ -15,7 +14,8 @@
             [cljs-time.core :as time]
             [medisoft.frontend.schemas :as schemas]
             [reagent.core :as reagent]
-            [reagent.ratom :as reagent-ratom]))
+            [reagent.ratom :as reagent-ratom]
+            [cljs-time.format :as time-format]))
 
 (def token-storage-key :medisoft-token-key)
 
@@ -32,10 +32,18 @@
 ;
 ;(defn underscorise-keys)
 
+(def app-time-format (time-format/formatter "yyyy-MM-dd"))
+
+(defn string->date-time [string]
+  (log/debug "converting string to date:" string (time-format/parse app-time-format string))
+
+  (time-format/parse app-time-format string))
+
 (defn custom-json-coercions [schema]
-  (let [coercion ({schema/Keyword utils/string->keyword
-                   schema/Bool    schema-coerce/string->boolean
-                   schema/Uuid    schema-coerce/string->uuid} schema)]
+  (let [coercion ({schemas/DateTime string->date-time
+                   schema/Keyword   utils/string->keyword
+                   schema/Bool      schema-coerce/string->boolean
+                   schema/Uuid      schema-coerce/string->uuid} schema)]
     coercion))
 
 ; (def request-coercer coerce/json-coercion-matcher)
@@ -61,9 +69,14 @@
 (defn map->api-request [map']
   (let [transform-key #(or (get exceptions %)
                            (str/camelize (name %)))
-        transform-fn  (fn [[k v]] (if (keyword? k)
-                                    [(transform-key k) v]
-                                    [k v]))]
+        transform-fn  (fn [[k v]]
+          (cond
+          (some #(instance? % v) [goog.date.Date goog.date.DateTime goog.date.UtcDateTime])
+                                      [(transform-key k) (time-format/unparse app-time-format v)]
+                                    (keyword? k)
+                                      [(transform-key k) v]
+                                    :else
+                                      [k v]))]
     (walk/postwalk (fn [x] (if (map? x)
                              (into {} (map transform-fn x))
                              x))
@@ -71,9 +84,11 @@
 
 (defn api-response->map [response]
   (let [transform-key #(keyword (str/dasherize %))
-        transform-fn  (fn [[k v]] (if (string? k)
-                                    [(transform-key k) v]
-                                    [k v]))]
+        transform-fn  (fn [[k v]] (cond
+                                    (string? k)
+                                      [(transform-key k) v]
+                                    :else
+                                      [k v]))]
     (walk/postwalk (fn [x] (if (map? x)
                              (into {} (map transform-fn x))
                              x))

@@ -156,7 +156,7 @@
   []
   (let [ignore-click (atom false)]
     (fn
-      [internal-model choices tab-index placeholder dropdown-click key-handler filter-box? drop-showing? label-fn]
+      [internal-model choices tab-index placeholder dropdown-click key-handler filter-box? drop-showing? label-fn selected-label-fn]
       (let [_ (reagent/set-state (reagent/current-component) {:filter-box? filter-box?})]
         [:a.chosen-single.chosen-default
          {:href          "javascript:"   ;; Required to make this anchor appear in the tab order
@@ -176,7 +176,7 @@
           }
          [:span
           (if @internal-model
-            (label-fn (item-for-id @internal-model choices))
+            (selected-label-fn (item-for-id @internal-model choices))
             placeholder)]
          [:div [:b]]])))) ;; This odd bit of markup produces the visual arrow on the right
 
@@ -198,6 +198,7 @@
    {:name :tab-index     :required false                  :type "integer | string"              :validate-fn number-or-string? :description "component's tabindex. A value of -1 removes from order"}
    {:name :id-fn         :required false :default :id     :type "(map) -> anything"             :validate-fn fn?               :description [:span "given an element of " [:code ":choices"] ", returns the unique identifier for this dropdown entry"]}
    {:name :label-fn      :required false :default :label  :type "(map) -> string | hiccup"      :validate-fn fn?               :description [:span "given an element of " [:code ":choices"] ", returns what should be displayed in this dropdown entry"]}
+   {:name :selected-label-fn     :required false nil :label  :type "(map) -> string | hiccup"      :validate-fn fn?               :description [:span "given an element of " [:code ":choices"] ", returns what should be displayed in this dropdown entry"]}
    {:name :group-fn      :required false :default :group  :type "(map) -> anything"             :validate-fn fn?               :description [:span "given an element of " [:code ":choices"] ", returns the group identifier for this dropdown entry"]}
    {:name :class         :required false                  :type "string"                        :validate-fn string?           :description "CSS class names, space separated"}
    {:name :style         :required false                  :type "CSS style map"                 :validate-fn css-style?        :description "CSS styles to add or override"}
@@ -215,11 +216,12 @@
         internal-model (reagent/atom @external-model)         ;; Create a new atom from the model to be used internally
         drop-showing?  (reagent/atom false)
         filter-text    (reagent/atom "")]
-    (fn [& {:keys [choices model on-change disabled? filter-box? regex-filter? placeholder width max-height tab-index id-fn label-fn group-fn class style attr]
+    (fn [& {:keys [choices model on-change disabled? filter-box? regex-filter? placeholder width max-height tab-index id-fn label-fn selected-label-fn group-fn class style attr]
             :or {id-fn :id label-fn :label group-fn :group}
             :as args}]
       {:pre [(validate-args-macro single-dropdown-args-desc args "single-dropdown")]}
-      (let [choices          (deref-or-value choices)
+      (let [selected-label-fn (or selected-label-fn label-fn)
+            choices          (deref-or-value choices)
             disabled?        (deref-or-value disabled?)
             regex-filter?    (deref-or-value regex-filter?)
             latest-ext-model (reagent/atom (deref-or-value model))
@@ -293,7 +295,7 @@
                           {:width (when width width)}
                           style)}
            attr)          ;; Prevent user text selection
-         [dropdown-top internal-model choices tab-index placeholder dropdown-click key-handler filter-box? drop-showing? label-fn]
+         [dropdown-top internal-model choices tab-index placeholder dropdown-click key-handler filter-box? drop-showing? label-fn selected-label-fn]
          (when (and @drop-showing? (not disabled?))
            [:div.chosen-drop
             [filter-text-box filter-box? filter-text key-handler drop-showing?]

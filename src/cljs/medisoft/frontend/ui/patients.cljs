@@ -12,6 +12,7 @@
             [medisoft.frontend.logic :as logic]
 
             [medisoft.frontend.log :as log]
+            [cljs-time.core :as time]
             [medisoft.frontend.validations :as validations]
             [medisoft.frontend.routes :as routes]
             [medisoft.frontend.history :as history]))
@@ -62,7 +63,23 @@
                   [:div.row [:div.col-lg-3 [:b "Personal ID"] [:br]
                                            (:personal-id @patient)]
                             [:div.col-lg-3 [:b "Address"] [:br]
-                                           (address-for-patient @patient)]]]])))
+                                           (address-for-patient @patient)]]
+                            [:h2 "Wizyty"]
+                  [:hr]
+                  [:div.row [:div.col-lg-12 
+                                [:table.table.table-hover
+                                       [:thead
+                                          [:th "Data"]
+                                          [:th "Lekarz"]]
+                                        [:tbody
+                                         (doall (for [appointment #_[{:date (time/local-date-time 2015 6 18) :employee {:firstname "Test" :surname "Test"}}]
+                                          (:medical-visits @patient)]
+                                                    ;(log/error "DERP" appointment)
+                                                    ^{:key (ui-utils/key-for appointment)}
+                                                    [:tr 
+                                                       [:td (ui-utils/date->str (:date appointment))
+                                                       ]
+                                                       [:td (get-in appointment [:employee :firstname])]]))]]]]]])))
 
 (defn patient-form-fields-component [patient errors {:keys [on-submit submit-button-text] :as opts}]
   (let [form-input (ui-utils/make-form-field-maker patient errors)]

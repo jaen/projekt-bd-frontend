@@ -1,5 +1,6 @@
 (ns medisoft.frontend.routes
-  (:require [bidi.bidi :as bidi]))
+  (:require [bidi.bidi :as bidi]
+            [medisoft.frontend.main]))
 
 ;; client side routing
 
@@ -20,7 +21,10 @@
                                     ["/create"           :medicines/create]
                                     [["/" :id] [[""      :medicines/show]
                                                 ["/edit" :medicines/edit]]]]]
-                      ]])
+                      ["appointments" [[""                  :appointments/list]
+                                 ["/create"           :appointments/create]
+                                 [["/" :id] [[""      :appointments/show]
+                                             ["/edit" :appointments/edit]]]]]]])
 
 (defn app-path-for [& args]
   (apply bidi/path-for app-routes args))
@@ -58,8 +62,14 @@
                                                   [[:id] :api.medicines/update]
                                                   [""    :api.medicines/list]
                                                   [""    :api.medicines/create]
-                                                  #_["delete"      :api.patients/delete]]]]]]])
+                                                  #_["delete"      :api.patients/delete]]]
+                                  ["medical-visits/"  [[[:id] :api.appointments/show]
+                                                       [[:id] :api.appointments/update]
+                                                       [""    :api.appointments/list]
+                                                       [""    :api.appointments/create]
+                                                       #_["delete"      :api.patients/delete]]]]]]])
 
 (defn server-path-for [& args]
   (let [path (apply bidi/path-for server-routes args)]
     (str base-address path)))
+

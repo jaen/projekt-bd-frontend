@@ -1,0 +1,2 @@
+(ns adzerk.boot-reload (:require [adzerk.boot-reload.client :as client] medisoft.frontend.core))
+(when-not (client/alive?) (client/connect "ws://localhost:47476" {:on-jsload (fn* [] (medisoft.frontend.core/mount-root!))}))
