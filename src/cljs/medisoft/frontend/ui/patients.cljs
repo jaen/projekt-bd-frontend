@@ -17,6 +17,9 @@
             [medisoft.frontend.routes :as routes]
             [medisoft.frontend.history :as history]))
 
+(defn person->str [employee]
+  (str (:firstname employee) " " (:surname employee)))
+
 (defn address-for-patient [patient]
   [:span (:street-name patient) " " (:house-number patient) "/" (:flat-number patient) [:br]
          (:zip-code patient) " " (:city patient) ", " (:country patient)])
@@ -64,22 +67,22 @@
                                            (:personal-id @patient)]
                             [:div.col-lg-3 [:b "Address"] [:br]
                                            (address-for-patient @patient)]]
-                            [:h2 "Wizyty"]
+                  [:h2 "Wizyty"]
                   [:hr]
-                  [:div.row [:div.col-lg-12 
-                                [:table.table.table-hover
-                                       [:thead
-                                          [:th "Data"]
-                                          [:th "Lekarz"]]
-                                        [:tbody
-                                         (doall (for [appointment #_[{:date (time/local-date-time 2015 6 18) :employee {:firstname "Test" :surname "Test"}}]
-                                          (:medical-visits @patient)]
-                                                    ;(log/error "DERP" appointment)
-                                                    ^{:key (ui-utils/key-for appointment)}
-                                                    [:tr 
-                                                       [:td (ui-utils/date->str (:date appointment))
-                                                       ]
-                                                       [:td (get-in appointment [:employee :firstname])]]))]]]]]])))
+                  (if-let [appointments (seq (:medical-visits @patient))]
+                    [:div.row [:div.col-lg-12
+                                  [:table.table.table-hover
+                                         [:thead
+                                            [:th "Data"]
+                                            [:th "Lekarz"]]
+                                          [:tbody
+                                           (doall (for [appointment appointments]
+                                                      ;(log/error "DERP" appointment)
+                                                      ^{:key (ui-utils/key-for appointment)}
+                                                      [:tr
+                                                         [:td (ui-utils/date->str (:date appointment))]
+                                                         [:td (person->str (:employee appointment))]]))]]]]
+                    [:div.row [:div.col-lg-12.text-muted "Brak wizyt"]])]])))
 
 (defn patient-form-fields-component [patient errors {:keys [on-submit submit-button-text] :as opts}]
   (let [form-input (ui-utils/make-form-field-maker patient errors)]

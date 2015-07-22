@@ -5,6 +5,8 @@
             [medisoft.frontend.api.patients :as patients]
             [medisoft.frontend.api.medicines :as medicines]
             [medisoft.frontend.api.appointments :as appointments]
+            [medisoft.frontend.api.rooms :as rooms]
+            [medisoft.frontend.api.devices :as devices]
 
             [medisoft.frontend.routes :as routes]
             [medisoft.frontend.log :as log]
@@ -71,3 +73,19 @@
 (def get-appointment    appointments/get)
 (def create-appointment appointments/create)
 (def update-appointment appointments/update)
+
+;; rooms API
+
+(def list-rooms  rooms/list)
+(def get-room    rooms/get)
+(def create-room rooms/create)
+(def update-room rooms/update)
+
+;; devices API
+
+(def list-devices  devices/list)
+(def get-device    devices/get)
+(def create-device devices/create)
+(def update-device devices/update)
+
+

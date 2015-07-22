@@ -13,6 +13,8 @@
             [medisoft.frontend.ui.employees :as employees]
             [medisoft.frontend.ui.medicines :as medicines]
             [medisoft.frontend.ui.appointments :as appointments]
+            [medisoft.frontend.ui.rooms :as rooms]
+            [medisoft.frontend.ui.devices :as devices]
 
             [medisoft.frontend.l18n :as l18n]
             [medisoft.frontend.log :as log]
@@ -62,6 +64,8 @@
      [user-component]
       (when @api/logged-in?
         [:ul.nav.navbar-nav.navbar-right
+          [:li [:a {:href (routes/app-path-for :rooms/list)}        (l18n/t :header/rooms)]]
+          [:li [:a {:href (routes/app-path-for :devices/list)}      (l18n/t :header/devices)]]
           [:li [:a {:href (routes/app-path-for :job-titles/list)}   (l18n/t :header/job-titles)]]
           [:li [:a {:href (routes/app-path-for :employees/list)}    (l18n/t :header/employees)]]
           [:li [:a {:href (routes/app-path-for :patients/list)}     (l18n/t :header/patients)]]
@@ -97,7 +101,17 @@
             :appointments/list  [appointments/appointment-list-component]
             :appointments/show  [appointments/appointment-show-component]
             :appointments/create [appointments/appointment-create-form-component]
-            :appointments/edit   [appointments/appointment-edit-form-component])
+            :appointments/edit   [appointments/appointment-edit-form-component]
+
+            :rooms/list  [rooms/room-list-component]
+            :rooms/show  [rooms/room-show-component]
+            :rooms/create [rooms/room-create-form-component]
+            :rooms/edit   [rooms/room-edit-form-component]
+
+            :devices/list  [devices/device-list-component]
+            :devices/show  [devices/device-show-component]
+            :devices/create [devices/device-create-form-component]
+            :devices/edit   [devices/device-edit-form-component])
      [dashboard/dashboard-component])])
 
 (defn footer-component []

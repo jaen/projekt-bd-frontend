@@ -12,7 +12,11 @@
                :employees    "pracownicy"
                :patients     "pacjenci"
                :medicines    "leki"
-               :appointments "wizyty"}
+               :appointments "wizyty"
+               :rooms        "pokoje"
+               :devices      "urządzenia"}
       :login-form {:header "proszę, zaloguj się"}
       :appointments {:new-appointment! "nowa wizyta"}
+      :rooms {:new-room! "nowy pokój"}
+      :devices {:new-device! "nowe urządzenie"}
       :bouncer {:validators {:required "pole %s musi być podane"}}}}

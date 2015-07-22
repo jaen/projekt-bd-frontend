@@ -107,7 +107,7 @@
           :device-reservations [EntityReference]
           :room-reservations   [EntityReference]
           :job-title           EntityReference
-          :medical-visits      [EntityReference]
+          :medical-visits      [(schema/either EntityReference {:ref schema/Str :class schema/Str})]
           :prescriptions       [EntityReference]
           :schedules           [EntityReference]
           :specializations     [EntityReference]
@@ -144,8 +144,19 @@
 (def Patient
   (make-entity
     (merge PersonalInformation
-           {:medical-visits         [Visit]
-            (schema/optional-key :prescription)           [EntityReference]})))
+           {:medical-visits                     [(schema/either
+                                                   {(schema/optional-key :class) schema/Str
+                                                    :id                          EntityId
+                                                    :date                        DateTime
+                                                    ;:employee    EntityReference #_(schema/either EntityReference Employee)
+                                                    ;:patient     EntityReference #_(schema/either EntityReference Patient)
+                                                    :description                 (schema/maybe schema/Str)
+                                                    (schema/optional-key :icd10) (schema/maybe [schema/Str])
+                                                    :employee                    (schema/either Employee EntityReference {:ref schema/Str :class schema/Str})
+                                                    :patient                     (schema/either (schema/recursive #'Patient) EntityReference {:ref schema/Str :class schema/Str})}
+                                                   EntityReference
+                                                   {:ref schema/Str :class schema/Str})] #_[Visit]
+            (schema/optional-key :prescription) [EntityReference]})))
 
 (def PatientListQuery
   {(schema/optional-key :firstname)   schema/Str
@@ -216,9 +227,9 @@
 
 (def VisitAdditionalAttributes
   {:description                 (schema/maybe schema/Str)
-   (schema/optional-key :icd10) [schema/Str]
+   (schema/optional-key :icd10) (schema/maybe [schema/Str])
    :employee    Employee
-   :patient     Patient})
+   :patient     Patient #_(schema/either Patient {:_ref schema/Str :class schema/Str})})
 
 (def Visit
   (merge EntityReference
@@ -242,4 +253,72 @@
 
 (def VisitUpdateResponse
   (schema/either (merge Visit VisitAdditionalAttributes)
-                 (errors-response VisitCreateRequest)))
+                 (errors-response VisitUpdateRequest)))
+
+;; Room schemas
+
+(def RoomAttributes
+  {:number      schema/Str})
+
+(def RoomAdditionalAttributes
+  {:devices [EntityReference]})
+
+(def Room
+  (merge EntityReference
+         RoomAttributes))
+
+(def RoomListResponse
+  [(merge Room RoomAdditionalAttributes)])
+
+(def RoomShowResponse
+  (merge Room RoomAdditionalAttributes))
+
+(def RoomCreateRequest
+  RoomAttributes)
+
+(def RoomCreateResponse
+  (schema/either (merge Room RoomAdditionalAttributes)
+                 (errors-response RoomCreateRequest)))
+
+(def RoomUpdateRequest
+  RoomAttributes)
+
+(def RoomUpdateResponse
+  (schema/either (merge Room RoomAdditionalAttributes)
+                 (errors-response RoomUpdateRequest)))
+
+;; Device schemas
+
+(def DeviceAttributes
+  {:producer      schema/Str
+   :serial        schema/Str
+   :purchase-date DateTime
+   :warranty-date DateTime
+   :room          EntityReference})
+
+;(def RoomAdditionalAttributes
+;  {:devices [EntityReference]})
+
+(def Device
+  (merge EntityReference
+         DeviceAttributes))
+
+(def DeviceListResponse
+  [(merge Device {})])
+
+(def DeviceShowResponse
+  (merge Device {}))
+
+(def DeviceCreateRequest
+  (merge (dissoc DeviceAttributes :room) {(schema/optional-key :room) EntityReference}))
+
+(def DeviceCreateResponse
+  (schema/either (merge Device {})
+                 (errors-response DeviceCreateRequest)))
+
+(def DeviceUpdateRequest
+  DeviceAttributes)
+
+(def DeviceUpdateResponse
+  (schema/either (merge Device {})
+                 (errors-response DeviceUpdateRequest)))

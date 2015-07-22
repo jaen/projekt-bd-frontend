@@ -159,3 +159,26 @@
   (let [class (str/dasherize (last (str/split (:class entity) ".")))
         id    (:id entity)]
     (str class ":" id)))
+
+(defn datetime->int [date-time]
+  (let [hour   (.getHours date-time) ; TODO: fix timezones
+        minute (.getMinutes date-time)]
+    (log/debug "time conversion:" hour minute)
+    (+ (* hour 100) minute)))
+
+(defn int->hour-min-pair [int]
+  (let [hour (quot int 100)
+        min  (mod int 100)]
+    [hour min]))
+
+(defn update-datetime-time [date-time int-time]
+  (let [[hour min] (int->hour-min-pair int-time)]
+    (doto date-time
+      (.setHours hour)
+      (.setMinutes min)
+      (.setSeconds 0)))
+  date-time)
+
+(defn address-for [patient]
+  [:span (:street-name patient) " " (:house-number patient) "/" (:flat-number patient) [:br]
+   (:zip-code patient) " " (:city patient) ", " (:country patient)])

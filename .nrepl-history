@@ -1,3 +1,6 @@
 (start-repl)
 (+ 1 1)
 (.log js/console "test")
+(start-repl)
+(.log js/console "test")
+exit

@@ -24,7 +24,15 @@
                       ["appointments" [[""                  :appointments/list]
                                  ["/create"           :appointments/create]
                                  [["/" :id] [[""      :appointments/show]
-                                             ["/edit" :appointments/edit]]]]]]])
+                                             ["/edit" :appointments/edit]]]]]
+                      ["rooms" [[""                  :rooms/list]
+                                       ["/create"           :rooms/create]
+                                       [["/" :id] [[""      :rooms/show]
+                                                   ["/edit" :rooms/edit]]]]]
+                      ["devices" [[""                  :devices/list]
+                                       ["/create"           :devices/create]
+                                       [["/" :id] [[""      :devices/show]
+                                                   ["/edit" :devices/edit]]]]]]])
 
 (defn app-path-for [& args]
   (apply bidi/path-for app-routes args))
@@ -67,7 +75,25 @@
                                                        [[:id] :api.appointments/update]
                                                        [""    :api.appointments/list]
                                                        [""    :api.appointments/create]
-                                                       #_["delete"      :api.patients/delete]]]]]]])
+                                                       #_["delete"      :api.patients/delete]]]
+                                  ["rooms/" [[[:id] :api.rooms/show]
+                                             [[:id] :api.rooms/update]
+                                             ["" :api.rooms/list]
+                                             ["" :api.rooms/create]]]
+                                  ["room-reservations/" [[[:id] :api.room-reservations/show]
+                                                         [[:id] :api.room-reservations/update]
+                                                         [[:id] :api.room-reservations/delete]
+                                                         ["" :api.room-reservations/list]
+                                                         ["" :api.room-reservations/create]]]
+                                  ["devices/" [[[:id] :api.devices/show]
+                                               [[:id] :api.devices/update]
+                                               ["" :api.devices/list]
+                                               ["" :api.devices/create]]]
+                                  ["device-reservations/" [[[:id] :api.device-reservations/show]
+                                                           [[:id] :api.device-reservations/update]
+                                                           [[:id] :api.device-reservations/delete]
+                                                           ["" :api.device-reservations/list]
+                                                           ["" :api.device-reservations/create]]]]]]])
 
 (defn server-path-for [& args]
   (let [path (apply bidi/path-for server-routes args)]

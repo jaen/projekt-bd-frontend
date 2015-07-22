@@ -71,12 +71,12 @@
                            (str/camelize (name %)))
         transform-fn  (fn [[k v]]
           (cond
-          (some #(instance? % v) [goog.date.Date goog.date.DateTime goog.date.UtcDateTime])
-                                      [(transform-key k) (time-format/unparse app-time-format v)]
-                                    (keyword? k)
-                                      [(transform-key k) v]
-                                    :else
-                                      [k v]))]
+            (some #(instance? % v) [goog.date.Date goog.date.DateTime goog.date.UtcDateTime])
+              [(transform-key k) (time-format/unparse app-time-format v)]
+            (keyword? k)
+              [(transform-key k) v]
+            :else
+              [k v]))]
     (walk/postwalk (fn [x] (if (map? x)
                              (into {} (map transform-fn x))
                              x))

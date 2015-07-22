@@ -41,6 +41,16 @@
    :appointments/show   (fn [params] (logic/set-current-page! :appointments/show params))
    :appointments/edit   (fn [params] (logic/set-current-page! :appointments/edit params))
    :appointments/create (fn [params] (logic/set-current-page! :appointments/create params))
+
+   :rooms/list   (fn []       (logic/set-current-page! :rooms/list))
+   :rooms/show   (fn [params] (logic/set-current-page! :rooms/show params))
+   :rooms/edit   (fn [params] (logic/set-current-page! :rooms/edit params))
+   :rooms/create (fn [params] (logic/set-current-page! :rooms/create params))
+
+   :devices/list   (fn []       (logic/set-current-page! :devices/list))
+   :devices/show   (fn [params] (logic/set-current-page! :devices/show params))
+   :devices/edit   (fn [params] (logic/set-current-page! :devices/edit params))
+   :devices/create (fn [params] (logic/set-current-page! :devices/create params))
    })
 
 ;;

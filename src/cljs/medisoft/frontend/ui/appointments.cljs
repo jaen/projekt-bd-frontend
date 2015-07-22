@@ -78,28 +78,7 @@
                             [:div.col-lg-12 [:b "Description"] [:br]
                                            (:description @appointment)]]]])))
 
-(defn datetime->int [date-time]
-  (let [hour   (.getHours date-time) ; TODO: fix timezones
-        minute (.getMinutes date-time)]
-    (log/debug "time conversion:" hour minute)
-    (+ (* hour 100) minute)))
 
-(defn int->hour-min-pair [int]
-  (let [hour (quot int 100)
-        min  (mod int 100)]
-    [hour min]))
-
-(defn update-datetime-time [date-time int-time]
-  (let [[hour min] (int->hour-min-pair int-time)]
-  (doto date-time
-    (.setHours hour)
-    (.setMinutes min)
-    (.setSeconds 0)))
-  date-time)
-
-(defn address-for [patient]
-  [:span (:street-name patient) " " (:house-number patient) "/" (:flat-number patient) [:br]
-   (:zip-code patient) " " (:city patient) ", " (:country patient)])
 
 ;(defn appointment-form-fields-component [appointment errors {:keys [on-submit submit-button-text] :as opts}]
 ;  (let [form-input (ui-utils/make-form-field-maker appointment errors)
@@ -189,7 +168,7 @@
                                             :on-change #(swap! appointment update-in [:employee] assoc :id %)
                                             :label-fn (fn [employee]
                                                         [:div.clearfix [:span (str (:firstname employee) " " (:surname employee))]
-                                                         [:span.pull-right.text-muted.text-right (address-for employee)]])
+                                                         [:span.pull-right.text-muted.text-right (ui-utils/address-for employee)]])
                                             :selected-label-fn (fn [employee]
                                                                  (str (:firstname employee) " " (:surname employee)))
                                             :type :select
@@ -198,7 +177,7 @@
                                            :on-change #(swap! appointment update-in [:patient] assoc :id %)
                                            :label-fn (fn [patient]
                                                        [:div.clearfix [:span (str (:firstname patient) " " (:surname patient))]
-                                                        [:span.pull-right.text-muted.text-right (address-for patient)]])
+                                                        [:span.pull-right.text-muted.text-right (ui-utils/address-for patient)]])
                                            :selected-label-fn (fn [patient]
                                                                 (str (:firstname patient) " " (:surname patient)))
                                            :type :select
@@ -215,8 +194,8 @@
                                                      (swap! appointment (fn [old]
                                                                           (log/debug "old:" old)
                                                                           (let [old-date (:date old)
-                                                                                int-time (datetime->int old-date)
-                                                                                new-date (update-datetime-time new-date int-time)]
+                                                                                int-time (ui-utils/datetime->int old-date)
+                                                                                new-date (ui-utils/update-datetime-time new-date int-time)]
                                                                             (log/debug "new:" new-date)
                                                                             (assoc old :date new-date)))))}]]]
      [:div.row
@@ -237,7 +216,7 @@
                                                  [:success ({:id id} :as response)] (do
                                                                                       ;(reset! patient response)
                                                                                       (log/debug "received response" response)
-                                                                                      (history/navigate-to! (routes/app-path-for :appointment/show :id id)))
+                                                                                      (history/navigate-to! (routes/app-path-for :appointments/show :id id)))
                                                  [:error   {:response ({:errors errors'} :as response)}] (do
                                                                                                            ;(reset! patient response)
                                                                                                            (log/error "received response" response)
