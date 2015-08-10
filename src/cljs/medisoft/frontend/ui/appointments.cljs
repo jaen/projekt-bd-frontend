@@ -39,7 +39,7 @@
                                                 ;[:th "Description"]
                                                 [:th "ICD10"]
                                                 [:th {:style {:width "200px"}} "Actions"]]
-               (log/debug "appointments" @appointments)
+               ;(log/debug "appointments" @appointments)
                                     (doall (for [appointment @appointments]
                                              ^{:key (ui-utils/key-for appointment)}
                                              [:tr [:td (ui-utils/date->str (:date appointment))]
@@ -161,7 +161,8 @@
                                                                      (reset! employees response)
                                                                      (log/debug "received response" response))
                                                [:error   response] (log/debug "received response" response))))
-    (log/debug "DERP" (:date @appointment))
+    ;(log/debug "DERP" @appointment)
+    ;(log/debug "DERP" (:date @appointment))
     [:form
      [:div.row
       [:div.col-lg-5 [form-input :employee {:model (ratom/reaction (get-in @appointment [:employee :id]))
@@ -190,13 +191,13 @@
                                               employee-id)
                                           true) @appointments)))
                                         :on-change (fn [new-date]
-                                                     (log/debug "date changed" new-date)
+                                                     ;(log/debug "date changed" new-date)
                                                      (swap! appointment (fn [old]
-                                                                          (log/debug "old:" old)
+                                                                          ;(log/debug "old:" old)
                                                                           (let [old-date (:date old)
                                                                                 int-time (ui-utils/datetime->int old-date)
                                                                                 new-date (ui-utils/update-datetime-time new-date int-time)]
-                                                                            (log/debug "new:" new-date)
+                                                                            ;(log/debug "new:" new-date)
                                                                             (assoc old :date new-date)))))}]]]
      [:div.row
       [:div.col-lg-5 [form-input :description #_{:type :textarea}]]]
@@ -223,34 +224,36 @@
                                                                                                            (reset! errors errors')))))
                     (.preventDefault e))]
     (fn []
-      (log/debug "appointment" @appointment)
-      (log/debug "appointment date" (time-format/unparse (time-format/formatters :rfc822) (:date @appointment)))
+      ;(log/debug "appointment" @appointment)
+      ;(log/debug "appointment date" (time-format/unparse (time-format/formatters :rfc822) (:date @appointment)))
       [:div "appointment create form"
        [appointment-form-fields-component appointment errors {:on-submit on-submit :submit-button-text "Create"}]])))
 
 (defn appointment-edit-form-component []
-  (let [medicine-id (:id @logic/current-params)
-        medicine (reagent/atom {})
+  (let [appointment-id (:id @logic/current-params)
+        appointment (reagent/atom {})
         errors  (reagent/atom {})
-        on-submit (fn [e] (api/update-medicine @medicine
+        on-submit (fn [e] (api/update-appointment @appointment
                                               (fn [result]
                                                 (match result
                                                        [:success ({:id id} :as response)] (do
                                                                                             ;(reset! patient response)
-                                                                                            (log/debug "received response" response)
-                                                                                            (history/navigate-to! (routes/app-path-for :medicines/show :id id)))
+                                                                                            ;(log/debug "received response" response)
+                                                                                            (history/navigate-to! (routes/app-path-for :appointments/show :id id)))
                                                        [:error   {:response ({:errors errors'} :as response)}] (do
                                                                                                                  ;(reset! patient response)
                                                                                                                  (log/error "received response" response)
                                                                                                                  (reset! errors errors')))))
                     (.preventDefault e))]
-    (api/get-medicine {:id medicine-id}
+    (api/get-appointment {:id appointment-id}
                      (fn [result]
                        (match result
                               [:success ({:id id} :as response)] (do
-                                                                   (log/debug "received response" response)
-                                                                   (reset! medicine (dissoc response :class :medical-visits :prescription)))
+                                                                   ;(log/debug "received response" response)
+                                                                   (reset! appointment (merge (dissoc response :class :employee :patient)
+                                                                                              {:employee (select-keys (:employee response) [:id])}
+                                                                           {:patient (select-keys (:patient response) [:id])})))
                               [:error   {:response ({:errors errors'} :as response)}] (log/error "received response" response))))
     (fn []
       [:div "patient edit form"
-       [appointment-form-fields-component medicine errors {:on-submit on-submit :submit-button-text "Edit"}]])))
+       [appointment-form-fields-component appointment errors {:on-submit on-submit :submit-button-text "Edit"}]])))

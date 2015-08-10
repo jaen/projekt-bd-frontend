@@ -256,7 +256,8 @@
     :align :center
     :class "noselect"
     :children [[:label {:class "form-control dropdown-button"}
-                (unparse (if (seq format) (formatter format) date-format) @model)]
+                (when-let [date @model]
+                  (unparse (if (seq format) (formatter format) date-format) date))]
                #_[:span  {:class "dropdown-button activator input-group-addon"} ;; TODO: Remove
                 [:i {:class "glyphicon glyphicon-th"}]]
                [:span.dropdown-button.activator.input-group-addon

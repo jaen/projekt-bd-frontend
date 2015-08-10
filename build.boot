@@ -61,3 +61,16 @@
                              :asset-path "assets/javascripts/cljs-out"
                              :output-dir "cljs-out"})
     (notify)))
+
+(deftask build []
+  (set-env!
+   :source-paths #(conj % "env/dev/cljs" "env/dev/clj")
+   :target-path  "build")
+  (comp
+    (from-lein)
+    (cljs :optimizations :advanced
+          :compiler-options {;:unified true
+                             :main "medisoft.client.main"
+                             :asset-path "assets/javascripts/cljs-out"
+                             :output-dir "cljs-out"})
+    (notify)))

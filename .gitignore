@@ -16,3 +16,4 @@ figwheel_server.log
 projekt_bd_frontend.iml
 out/
 resources/public/assets/javascripts/cljs-out
+build/

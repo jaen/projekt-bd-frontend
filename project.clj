@@ -23,6 +23,7 @@
                  ;[com.palletops/leaven "0.3.0"]
                  ;[com.palletops/bakery-weasel "0.3.0"]
                  [prismatic/schema "0.4.2"]
+                 [cddr/integrity "0.3.1-SNAPSHOT"]
                  [cats "0.4.0"]
                  ;[funcool/promesa "0.1.0"]
                  [com.andrewmcveigh/cljs-time "0.3.10" :exclusions [com.cemerick/austin]]

@@ -1,16 +1,20 @@
 (ns medisoft.frontend.utils
   (:require [cljs-time.format :as time-format]
-            [cljs-time.core :as time]))
+            [cljs-time.core :as time]
+            [cuerdas.core :as str]))
 
 (defn string->keyword [s]
   (if (string? s) (keyword s) s))
 
-(def time-formatter (time-format/formatters :rfc822))
+(def time-formatter
+  (time-format/formatter "yyyy-MM-dd'T'HH:mm:ss.SSS")
+  #_(time-format/formatters :date-time))
 
-(defn str->clj-time [str]
-  (time-format/parse time-formatter str))
+(defn string->clj-time [str]
+  (when-not (str/blank? str)
+    (time-format/parse time-formatter str)))
 
-(defn clj-time->str [time]
+(defn clj-time->string [time]
   (time-format/unparse time-formatter time))
 
 (defn derefable?

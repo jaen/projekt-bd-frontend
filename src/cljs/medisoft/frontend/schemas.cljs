@@ -48,6 +48,10 @@
   {(schema/optional-key :class) schema/Str
    :id    EntityId})
 
+(def RelativeReference
+  {:ref schema/Str
+   :class schema/Str})
+
 (defn make-entity [schema]
   (merge EntityReference schema)
   #_(schema/either
@@ -100,6 +104,8 @@
 
 ;; employee schemas
 
+(declare Visit)
+
 (def Employee
   (make-entity
     (merge PersonalInformation
@@ -107,7 +113,7 @@
           :device-reservations [EntityReference]
           :room-reservations   [EntityReference]
           :job-title           EntityReference
-          :medical-visits      [(schema/either EntityReference {:ref schema/Str :class schema/Str})]
+          :medical-visits      [(schema/either (schema/recursive #'Visit) EntityReference RelativeReference)]
           :prescriptions       [EntityReference]
           :schedules           [EntityReference]
           :specializations     [EntityReference]
@@ -139,24 +145,11 @@
 
 ;; patient schemas
 
-(declare Visit)
-
 (def Patient
   (make-entity
     (merge PersonalInformation
-           {:medical-visits                     [(schema/either
-                                                   {(schema/optional-key :class) schema/Str
-                                                    :id                          EntityId
-                                                    :date                        DateTime
-                                                    ;:employee    EntityReference #_(schema/either EntityReference Employee)
-                                                    ;:patient     EntityReference #_(schema/either EntityReference Patient)
-                                                    :description                 (schema/maybe schema/Str)
-                                                    (schema/optional-key :icd10) (schema/maybe [schema/Str])
-                                                    :employee                    (schema/either Employee EntityReference {:ref schema/Str :class schema/Str})
-                                                    :patient                     (schema/either (schema/recursive #'Patient) EntityReference {:ref schema/Str :class schema/Str})}
-                                                   EntityReference
-                                                   {:ref schema/Str :class schema/Str})] #_[Visit]
-            (schema/optional-key :prescription) [EntityReference]})))
+           {:medical-visits  [(schema/either (schema/recursive #'Visit) EntityReference RelativeReference)]
+           (schema/optional-key :prescription) [EntityReference]})))
 
 (def PatientListQuery
   {(schema/optional-key :firstname)   schema/Str
@@ -222,14 +215,12 @@
 (def VisitAttributes
   {:date        DateTime
    :description schema/Str
-   :employee    EntityReference #_(schema/either EntityReference Employee)
-   :patient     EntityReference #_(schema/either EntityReference Patient)})
+   :employee     (schema/either (schema/recursive #'Employee) EntityReference RelativeReference)
+   :patient      (schema/either (schema/recursive #'Patient) EntityReference RelativeReference)
+   (schema/optional-key :icd10) (schema/maybe [schema/Str])})
 
 (def VisitAdditionalAttributes
-  {:description                 (schema/maybe schema/Str)
-   (schema/optional-key :icd10) (schema/maybe [schema/Str])
-   :employee    Employee
-   :patient     Patient #_(schema/either Patient {:_ref schema/Str :class schema/Str})})
+  {})
 
 (def Visit
   (merge EntityReference
@@ -257,11 +248,14 @@
 
 ;; Room schemas
 
+(declare Device)
+
 (def RoomAttributes
-  {:number      schema/Str})
+  {:number      schema/Str
+   (schema/optional-key :devices) [(schema/either (schema/recursive #'Device) EntityReference RelativeReference)]})
 
 (def RoomAdditionalAttributes
-  {:devices [EntityReference]})
+  {})
 
 (def Room
   (merge EntityReference
@@ -294,7 +288,7 @@
    :serial        schema/Str
    :purchase-date DateTime
    :warranty-date DateTime
-   :room          EntityReference})
+   :room          (schema/either (schema/recursive #'Room) EntityReference RelativeReference)})
 
 ;(def RoomAdditionalAttributes
 ;  {:devices [EntityReference]})

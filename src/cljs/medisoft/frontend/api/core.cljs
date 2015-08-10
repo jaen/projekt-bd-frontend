@@ -7,6 +7,7 @@
             [cljs.core.match :refer-macros [match]]
             [ajax.core :as ajax]
             [hodgepodge.core :as hodgepodge]
+            [cljs.pprint :as pprint]
 
             [medisoft.frontend.log :as log]
             [medisoft.frontend.utils :as utils]
@@ -32,12 +33,10 @@
 ;
 ;(defn underscorise-keys)
 
-(def app-time-format (time-format/formatter "yyyy-MM-dd"))
-
 (defn string->date-time [string]
-  (log/debug "converting string to date:" string (time-format/parse app-time-format string))
+  ; (log/debug "converting string to date:" string)
 
-  (time-format/parse app-time-format string))
+  (utils/string->clj-time string))
 
 (defn custom-json-coercions [schema]
   (let [coercion ({schemas/DateTime string->date-time
@@ -72,7 +71,7 @@
         transform-fn  (fn [[k v]]
           (cond
             (some #(instance? % v) [goog.date.Date goog.date.DateTime goog.date.UtcDateTime])
-              [(transform-key k) (time-format/unparse app-time-format v)]
+              [(transform-key k) (utils/clj-time->string v)]
             (keyword? k)
               [(transform-key k) v]
             :else
@@ -101,15 +100,15 @@
         (let [coerced-response (coercer (let [a (cond
                                                   (vector? response) (mapv api-response->map response) ; TODO: think of something more general maybe?
                                                   :else              (api-response->map response))]
-                                          (log/warn "got this after transform:" a)
+                                          ;(log/warn "got this after transform:" a)
                                           a))]
           (if-not (schema-utils/error? coerced-response)
             (do
-              (log/debug (str "SUCCESS - " method " " uri) coerced-response)
+              ;(log/debug (str "SUCCESS - " method " " uri) coerced-response)
               (handler [:success coerced-response]))
             (throw (schema.utils/error-val coerced-response)) #_(ex/raise :response-validation-failed coerced-response)))
         (do
-          (log/debug (str "SUCCESS - " method " " uri) response)
+          ;(log/debug (str "SUCCESS - " method " " uri) response)
           (handler [:success response]))))))
 
 ;(defn wrap-error-handler [handler]
@@ -130,15 +129,15 @@
                                               a (cond
                                                   (vector? response) (mapv api-response->map response) ; TODO: think of something more general maybe?
                                                   :else              (api-response->map response))]
-                                          (log/warn "got this after transform:" a)
+                                          ;(log/warn "got this after transform:" a)
                                           a))]
           (if-not (schema-utils/error? coerced-response)
             (do
-              (log/error (str "ERROR - " method " " uri) (merge response {:response coerced-response}))
+              ;(log/error (str "ERROR - " method " " uri) (merge response {:response coerced-response}))
               (handler [:error (merge response {:response coerced-response})]))
             (throw (schema.utils/error-val coerced-response)) #_(ex/raise :response-validation-failed coerced-response)))
         (do
-          (log/error (str "ERROR - " method " " uri) response)
+          ;(log/error (str "ERROR - " method " " uri) response)
           (handler (handler [:error response])))))))
 
 ;(def my-default-formats
@@ -166,17 +165,17 @@
         ;params                      {:params (map->api-request original-params)}
         api-opts                    (merge (merge-with merge (dissoc opts :schema) auth-headers)
                                            handlers format)]
-    (log/debug (str "sending request - " method " " uri) api-opts)
-    (when-not request-schema
-      (log/warn "no request schema for" method uri))
-    (when-not response-schema
-      (log/warn "no response schema for" method uri))
+    ;(log/debug (str "sending request - " method " " uri) api-opts)
+    ;(when-not request-schema
+    ;  (log/warn "no request schema for" method uri))
+    ;(when-not response-schema
+    ;  (log/warn "no response schema for" method uri))
     (when request-schema
       (schema/validate request-schema original-params))
-    (log/debug "params:" original-params)
+    ;(log/debug "params:" original-params)
     (let [transformed-params (map->api-request original-params)
           api-opts           (merge api-opts {:params transformed-params})]
-      (log/debug "coerced api-opts:" api-opts)
+      ;(log/debug "coerced api-opts:" api-opts)
       (match method
              :get  (ajax/GET  uri api-opts)
              :post (ajax/POST uri api-opts)
