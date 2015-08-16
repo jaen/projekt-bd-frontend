@@ -312,8 +312,8 @@ th {
 }
 @font-face {
   font-family: 'Glyphicons Halflings';
-  src: url(/assets/fonts/bootstrap/glyphicons-halflings-regular.eot?1426714554);
-  src: url(/assets/fonts/bootstrap/glyphicons-halflings-regular.eot?&1426714554#iefix) format("embedded-opentype"), url(/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2?1426714554) format("woff2"), url(/assets/fonts/bootstrap/glyphicons-halflings-regular.woff?1426714554) format("woff"), url(/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf?1426714554) format("truetype"), url(/assets/fonts/bootstrap/glyphicons-halflings-regular.svg?1426714554#glyphicons_halflingsregular) format("svg");
+  src: url(/assets/fonts/bootstrap/glyphicons-halflings-regular.eot?1434385583);
+  src: url(/assets/fonts/bootstrap/glyphicons-halflings-regular.eot?&1434385583#iefix) format("embedded-opentype"), url(/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2?1434385583) format("woff2"), url(/assets/fonts/bootstrap/glyphicons-halflings-regular.woff?1434385583) format("woff"), url(/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf?1434385583) format("truetype"), url(/assets/fonts/bootstrap/glyphicons-halflings-regular.svg?1434385583#glyphicons_halflingsregular) format("svg");
 }
 .glyphicon {
   position: relative;
@@ -11844,6 +11844,25 @@ footer > .container .text-muted {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.rc-datepicker td.marked {
+  color: #d9534f;
+}
+
+table.table-appointments td.free {
+  padding: 0px;
+}
+table.table-appointments td.free a {
+  padding: 8px;
+  color: #777777;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+table.table-appointments td.free a:hover {
+  background-color: #eee;
 }
 
 /*# sourceMappingURL=application.css.map */

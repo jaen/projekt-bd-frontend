@@ -62,3 +62,27 @@ footer {
   }
 }
 
+.rc-datepicker {
+  td.marked {
+    color: $brand-danger;
+  }
+}
+
+table.table-appointments {
+  td.free {
+  padding: 0px;
+
+    a {
+      padding: 8px;
+      color: #777777;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      display: block;
+
+      &:hover {
+        background-color: #eee;
+      }
+    }
+  }
+}

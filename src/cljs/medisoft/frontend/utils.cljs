@@ -17,6 +17,11 @@
 (defn clj-time->string [time]
   (time-format/unparse time-formatter time))
 
+(defn same-day? [left right]
+  (and (= (time/year left) (time/year right))
+       (= (time/month left) (time/month right))
+       (= (time/day left) (time/day right))))
+
 (defn derefable?
   "true if obj is an instance of clojure.lang.IDeref"
   [obj]

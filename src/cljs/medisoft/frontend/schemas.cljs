@@ -105,6 +105,7 @@
 ;; employee schemas
 
 (declare Visit)
+(declare Prescription)
 
 (def Employee
   (make-entity
@@ -114,7 +115,7 @@
           :room-reservations   [EntityReference]
           :job-title           EntityReference
           :medical-visits      [(schema/either (schema/recursive #'Visit) EntityReference RelativeReference)]
-          :prescriptions       [EntityReference]
+          :prescriptions       [(schema/either (schema/recursive #'Prescription) EntityReference RelativeReference)]
           :schedules           [EntityReference]
           :specializations     [EntityReference]
           :users               [EntityReference]})))
@@ -148,8 +149,9 @@
 (def Patient
   (make-entity
     (merge PersonalInformation
-           {:medical-visits  [(schema/either (schema/recursive #'Visit) EntityReference RelativeReference)]
-           (schema/optional-key :prescription) [EntityReference]})))
+           {:medical-visits [(schema/either (schema/recursive #'Visit) EntityReference RelativeReference)]
+            ; :prescriptions  [(schema/either (schema/recursive #'Prescription) EntityReference RelativeReference)]
+            })))
 
 (def PatientListQuery
   {(schema/optional-key :firstname)   schema/Str
@@ -210,13 +212,28 @@
 (def MedicineUpdateResponse
   MedicineCreateResponse)
 
+;; Prescription schemas
+
+(def PrescriptionAttributes
+  {:department schema/Any ; FIXME: add departments
+   :employee  (schema/either (schema/recursive #'Employee) EntityReference RelativeReference)
+   :patient   (schema/either (schema/recursive #'Patient) EntityReference RelativeReference)
+   :medicines [(schema/either (schema/recursive #'Medicine) EntityReference RelativeReference)]
+   :is-chronic-disease schema/Bool
+   })
+
+(def Prescription
+  (merge EntityReference
+         PrescriptionAttributes))
+
 ;; visit schemas
 
 (def VisitAttributes
   {:date        DateTime
    :description schema/Str
-   :employee     (schema/either (schema/recursive #'Employee) EntityReference RelativeReference)
-   :patient      (schema/either (schema/recursive #'Patient) EntityReference RelativeReference)
+   :employee      (schema/either (schema/recursive #'Employee) EntityReference RelativeReference)
+   :patient       (schema/either (schema/recursive #'Patient) EntityReference RelativeReference)
+   :prescriptions [(schema/either (schema/recursive #'Prescription) EntityReference RelativeReference)]
    (schema/optional-key :icd10) (schema/maybe [schema/Str])})
 
 (def VisitAdditionalAttributes

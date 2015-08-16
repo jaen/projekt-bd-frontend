@@ -140,21 +140,30 @@
   (cljs-time.core/= (cljs-time.coerce/to-local-date this-date-time) (cljs-time.coerce/to-local-date that-date-time)))
 
 (defn- table-td
-  [date focus-month selected today {minimum :minimum maximum :maximum disabled-dates :disabled-dates :as attributes} disabled? on-change]
+  [date focus-month selected today {minimum :minimum maximum :maximum disabled-dates :disabled-dates marked-dates :marked-dates :as attributes} disabled? on-change]
   ;;following can be simplified and terse
+  (log/error "FUCKING SHIT" attributes)
   (let [enabled-min   (if minimum (>=date date minimum) true)
         enabled-max   (if maximum (<=date date maximum) true)
         enabled-day   (and enabled-min enabled-max)
         disabled-dates (deref-or-value disabled-dates)
+        marked-dates (deref-or-value marked-dates)
         disabled-day? (if enabled-day
                         (nil? ((:enabled-days attributes) (day-of-week date)))
                         true)
         disabled-day? (or disabled-day? (some (partial same-date? date) disabled-dates))
+        ;disabled-day? (if enabled-day
+        ;                (nil? ((:enabled-days attributes) (day-of-week date)))
+        ;                true)
+        marked-day?  (or false #_marked-day? (some (partial same-date? date) marked-dates))
         styles       (cond disabled?
                            "off"
 
                            disabled-day?
                            "off"
+
+                           (and marked-day? (= focus-month (month date)))
+                           "marked available"
 
                            (= focus-month (month date))
                            "available"
@@ -208,8 +217,14 @@
     (merge attributes {:enabled-days enabled-days
                        :today (now)})))
 
+(defn optional-goog-date? [arg]
+  (let [arg (deref-or-value arg)]
+    (cond
+      (nil? arg) true
+      :else      (instance? goog.date.UtcDateTime arg))))
+
 (def datepicker-args-desc
-  [{:name :model        :required true                        :type "goog.date.UtcDateTime | atom"   :validate-fn goog-date? :description "the selected date. Should match :enabled-days"}
+  [{:name :model        :required true                        :type "goog.date.UtcDateTime | atom"   :validate-fn optional-goog-date? :description "the selected date. Should match :enabled-days"}
    {:name :on-change    :required true                        :type "goog.date.UtcDateTime -> nil"   :validate-fn fn?        :description "called when a new selection is made"}
    {:name :disabled?    :required false :default false        :type "boolean | atom"                                         :description "when true, the can't select dates but can navigate"}
    {:name :enabled-days :required false                       :type "set"                            :validate-fn set?       :description "a subset of #{:Su :Mo :Tu :We :Th :Fr :Sa}. Only dates falling on these days will be user-selectable. Default is all 7 days"}
@@ -250,11 +265,12 @@
   "Provide clickable field with current date label and dropdown button e.g. [ 2014 Sep 17 | # ]"
   [shown? model format]
   [:div {:class    "input-group display-flex noselect"
-         :style    (flex-child-style "none")
+         :style    (merge (flex-child-style "none") {:width "100%"})
          :on-click (handler-fn (swap! shown? not))}
    [h-box
     :align :center
     :class "noselect"
+    :style {:width "100%"}
     :children [[:label {:class "form-control dropdown-button"}
                 (when-let [date @model]
                   (unparse (if (seq format) (formatter format) date-format) date))]
@@ -273,7 +289,7 @@
   ; {:pre [(validate-args-macro datepicker-dropdown-args-desc args "datepicker-dropdown")]}
   (let [shown?         (reagent/atom false)
         cancel-popover #(reset! shown? false)
-        position       :below-center]
+        position       :below-right]
     (fn
       [& {:keys [model show-weeks? on-change format] :as passthrough-args}]
       (let [collapse-on-select (fn [new-model]
@@ -284,7 +300,7 @@
                                     (merge {:hide-border? true})         ;; apply defaults
                                     vec
                                     flatten)]
-        (log/error "WTAF" (into [datepicker] passthrough-args))
+        ; (log/error "WTAF" (into [datepicker] passthrough-args))
         [popover-anchor-wrapper
          :showing? shown?
          :position position

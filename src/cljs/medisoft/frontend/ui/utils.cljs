@@ -8,7 +8,10 @@
             [medisoft.frontend.ui.datepicker :as datepicker]
             [medisoft.frontend.log :as log]
             [cljs-time.core :as time]
-            [cljs-time.format :as time-format]))
+            [cljs-time.format :as time-format]
+            [reagent.ratom :as ratom]
+            ;[medisoft.frontend.ui.utils :as ui-utils]
+            [reagent.ratom :as ratom :include-macros true]))
 
 (defn date->str [date]
   (if date
@@ -53,37 +56,37 @@
        :reagent-render         (fn [_ & contents]
                                  (vec (cons :span contents)))})))
 
-(defn labelize [str]
-  (str/titleize (str/humanize (name str))))
+(defn labelize [str-arr]
+  (str/titleize (str/humanize (str/join " " (map name str-arr)))))
 
 (defmulti form-field-component (fn [_ opts] (:type opts)))
 
 (defmethod form-field-component :input [name' {:keys [data errors] :as opts}]
   [rc-core/v-box :class    "form-group"
    :children [[:label #_{:for "login-form-login"} (or (:label opts) (labelize name'))]
-              [rc-core/input-text :model (or (get @data name') "")
+              [rc-core/input-text :model (or (get-in @data name') "")
                                   :on-change   #(swap! data assoc name' %)
                                   ;:placeholder "Enter login"
                                   :class       "form-control"
                                   :width "100%"
-                                  :status      (when (get @errors name') :error)
+                                  :status      (when (get-in @errors name') :error)
                                   ;:attr        {:id "login-form-login"}
                                   ]
-              (when (name' @errors) [rc-core/label :label (str/join ", " (name' @errors))
+              (when (get-in @errors name') [rc-core/label :label (str/join ", " (name' @errors))
                                      :style {:padding-top "10px"}
                                      :class "text-danger"])]])
 
 (defmethod form-field-component :password [name' {:keys [data errors] :as opts}]
   [rc-core/v-box :class    "form-group"
    :children [[:label #_{:for "login-form-login"} (or (:label opts) (labelize name'))]
-              [rc-core/input-text :model (or (get @data name') "")
+              [rc-core/input-text :model (or (get-in @data name') "")
                                   :on-change   #(swap! data assoc name' %)
                                   ;:placeholder "Enter login"
                                   :class       "form-control"
                                   :width "100%"
-                                  :status      (when (get @errors name') :error)
+                                  :status      (when (get-in @errors name') :error)
                                   :attr        {:type :password}]
-              (when (name' @errors) [rc-core/label :label (str/join ", " (name' @errors))
+              (when (get-in @errors name') [rc-core/label :label (str/join ", " (name' @errors))
                                      :style {:padding-top "10px"}
                                      :class "text-danger"])]])
 
@@ -91,27 +94,28 @@
   [rc-core/v-box :class    "form-group"
    :children [[:label #_{:for "login-form-login"} (or (:label opts) (labelize name'))]
               [dropdown/single-dropdown :choices choices
-                                        :model   (or model (get @data name') "")
-                                        :class   (str/join " " [(when (get @errors name') "has-error")])
+                                        :model   (or model (get-in @data name') "")
+                                        :class   (str/join " " [(when (get-in @errors name') "has-error")])
                                         :label-fn (or label-fn #(:label %)) ; (fn [choice] (:name choice))
                                         :selected-label-fn selected-label-fn
                                         :width "100%"
                                         :filter-box? true
                                         :on-change (or on-change #(swap! data assoc name' %))]
-              (when (name' @errors) [rc-core/label :label (str/join ", " (name' @errors))
+              (when (get-in @errors name') [rc-core/label :label (str/join ", " (name' @errors))
                                                    :style {:padding-top "10px"}
                                                    :class "text-danger"])]])
 
-(defmethod form-field-component :date [name' {:keys [data errors model on-change disabled-dates] :as opts}]
+(defmethod form-field-component :date [name' {:keys [data errors model on-change disabled-dates marked-dates] :as opts}]
   [rc-core/v-box :class    "form-group"
    :children [[:label #_{:for "login-form-login"} (or (:label opts) (labelize name'))]
               [datepicker/datepicker-dropdown
-               :model   (or model (get @data name') (atom (time/now)))
-               :class   (str/join " " [(when (get @errors name') "has-error")])
+               :model   (or model (get-in @data name') (atom (time/now)))
+               :class   (str/join " " [(when (get-in @errors name') "has-error")])
                :disabled-dates (or disabled-dates (atom []))
+               :marked-dates (or marked-dates (atom []))
                ;:style {:width "100%"}
                :on-change (or on-change #(swap! data assoc name' %))]
-              (when (name' @errors) [rc-core/label :label (str/join ", " (name' @errors))
+              (when (get-in @errors name') [rc-core/label :label (str/join ", " (name' @errors))
                                      :style {:padding-top "10px"}
                                      :class "text-danger"])]])
 
@@ -119,14 +123,58 @@
   [rc-core/v-box :class    "form-group"
    :children [[:label #_{:for "login-form-login"} (or (:label opts) (labelize name'))]
               [input-time/input-time
-               :model   (or model (get @data name') "1337")
-               :class   (str/join " " [(when (get @errors name') "has-error")])
+               :model   (or model (get-in @data name') "1337")
+               :class   (str/join " " [(when (get-in @errors name') "has-error")])
                :show-icon? true
                ;:style {:width "100%"}
                :on-change (or on-change #(swap! data assoc name' %))]
-              (when (name' @errors) [rc-core/label :label (str/join ", " (name' @errors))
+              (when (get-in @errors name') [rc-core/label :label (str/join ", " (name' @errors))
                                      :style {:padding-top "10px"}
                                      :class "text-danger"])]])
+
+(declare datetime->int)
+(declare update-datetime-time)
+
+(defmethod form-field-component :date-time [name' {:keys [data errors model on-change disabled-dates marked-dates] :as opts}]
+  (let [date-model (ratom/reaction (or (utils/realised model) (get @data name') (atom (time/now))))
+        time-model (ratom/reaction (or (datetime->int (utils/realised model)) (get @data name') "1337"))
+        on-change-fn (or on-change #(swap! data assoc name' %))]
+  [rc-core/v-box :class    "form-group"
+   :children [[:label #_{:for "login-form-login"} (or (:label opts) (labelize name'))]
+              [rc-core/h-box
+               :gap "10px"
+               :children [
+                          [input-time/input-time
+                           :model   time-model
+                           :class   (str/join " " [(when (get-in @errors name') "has-error")])
+                           :show-icon? true
+                           ;:style {:width "100%"}
+                           :on-change (fn [new-time]
+                                        (let [old-date @date-model]
+                                          ; (log/debug "old:" old)
+                                          (let [new-date (update-datetime-time old-date new-time)]
+                                            (log/debug "new:" new-date)
+                                            (on-change-fn new-date))))
+                           #_(or on-change #(swap! data assoc name' %))]
+                          [datepicker/datepicker-dropdown
+                           :model   date-model
+                           :class   (str/join " " [(when (get-in @errors name') "has-error")])
+                           :disabled-dates (or disabled-dates (atom []))
+                           :marked-dates (or marked-dates (atom []))
+                           ;:style {:width "100%"}
+                           :on-change (fn [new-date]
+                                        (let [old-date @date-model]
+                                        ; (log/debug "old:" old)
+                                        (let [int-time (datetime->int old-date)
+                                              new-date (update-datetime-time new-date int-time)]
+                                          (log/debug "new:" new-date)
+                                          (on-change-fn new-date))))
+
+                           #_(or on-change #(swap! data assoc name' %))]
+                          ]]
+              (when (get-in @errors name') [rc-core/label :label (str/join ", " (name' @errors))
+                                     :style {:padding-top "10px"}
+                                     :class "text-danger"])]]))
 
 
 ;(defmethod form-field-component :date-time [name' {:keys [data errors choices model on-change label-fn] :as opts}]
@@ -153,7 +201,8 @@
 (defn make-form-field-maker [data errors]
   (let [default-opts {:type :input}] ;atom atom]
     (fn [name' opts]
-      (form-field-component name' (merge default-opts opts {:data data :errors errors})))))
+      (let [new-name (mapv keyword (flatten [name']))]
+        (form-field-component new-name (merge default-opts opts {:data data :errors errors}))))))
 
 (defn key-for [entity]
   (let [class (str/dasherize (last (str/split (:class entity) ".")))
@@ -161,23 +210,27 @@
     (str class ":" id)))
 
 (defn datetime->int [date-time]
-  (let [hour   (.getHours date-time) ; TODO: fix timezones
-        minute (.getMinutes date-time)]
-    (log/debug "time conversion:" hour minute)
-    (+ (* hour 100) minute)))
+  (if date-time
+    (let [hour   (.getHours date-time) ; TODO: fix timezones
+          minute (.getMinutes date-time)]
+      (log/debug "time conversion:" hour minute)
+      (+ (* hour 100) minute))
+    0))
 
 (defn int->hour-min-pair [int]
-  (let [hour (quot int 100)
-        min  (mod int 100)]
-    [hour min]))
+  (when int
+    (let [hour (quot int 100)
+          min  (mod int 100)]
+      [hour min])))
 
 (defn update-datetime-time [date-time int-time]
-  (let [[hour min] (int->hour-min-pair int-time)]
-    (doto date-time
-      (.setHours hour)
-      (.setMinutes min)
-      (.setSeconds 0)))
-  date-time)
+  (when date-time
+    (let [[hour min] (int->hour-min-pair int-time)]
+      (doto date-time
+        (.setHours hour)
+        (.setMinutes min)
+        (.setSeconds 0)))
+    date-time))
 
 (defn address-for [patient]
   [:span (:street-name patient) " " (:house-number patient) "/" (:flat-number patient) [:br]

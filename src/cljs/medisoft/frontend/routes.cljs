@@ -74,6 +74,7 @@
                                   ["medical-visits/"  [[[:id] :api.appointments/show]
                                                        [[:id] :api.appointments/update]
                                                        [""    :api.appointments/list]
+                                                       ["/filter"    :api.appointments/list-filtered]
                                                        [""    :api.appointments/create]
                                                        #_["delete"      :api.patients/delete]]]
                                   ["rooms/" [[[:id] :api.rooms/show]

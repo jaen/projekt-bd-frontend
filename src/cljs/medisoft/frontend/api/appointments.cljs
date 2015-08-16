@@ -7,12 +7,19 @@
 
 ;;
 
-(defn list [_ callback]
-  (core/api-call :get
-                 (routes/server-path-for :api.appointments/list)
-                 {:schema      {;:request  schemas/VisitListQuery
-                                :response schemas/VisitListResponse}
-                  :response-fn callback}))
+(defn list [{:keys [filter]} callback]
+  (if (some? filter)
+    (core/api-call :get
+                   (routes/server-path-for :api.appointments/list-filtered)
+                   {:params      {:filter filter}
+                    :schema      {;:request  schemas/VisitListQuery
+                                  :response schemas/VisitListResponse}
+                    :response-fn callback})
+    (core/api-call :get
+                   (routes/server-path-for :api.appointments/list)
+                   {:schema      {;:request  schemas/VisitListQuery
+                                  :response schemas/VisitListResponse}
+                    :response-fn callback})))
 
 (defn get [{:keys [id]} callback]
   (core/api-call :get
