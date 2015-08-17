@@ -80,8 +80,10 @@
                                                       ;(log/error "DERP" appointment)
                                                       ^{:key (ui-utils/key-for appointment)}
                                                       [:tr
-                                                         [:td (ui-utils/date->str (:date appointment))]
-                                                         [:td (person->str (:employee appointment))]]))]]]]
+                                                         [:td [:a {:href (routes/app-path-for :appointments/show :id (:id appointment))}
+                                                               (ui-utils/date->str (:date appointment))]]
+                                                         [:td [:a {:href (routes/app-path-for :employees/show :id (get-in appointment [:employee :id]))}
+                                                               (person->str (:employee appointment))]]]))]]]]
                     [:div.row [:div.col-lg-12.text-muted "Brak wizyt"]])]])))
 
 (defn patient-form-fields-component [patient errors {:keys [on-submit submit-button-text] :as opts}]

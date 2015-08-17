@@ -215,8 +215,8 @@
   (log/debug "checkbox data" opts)
   [rc-core/v-box :class    "form-group"
                  :children [[:label #_{:for "login-form-login"} (or (:label data) (labelize name'))]
-                            [rc-core/checkbox  :model (or (get @data name') false)
-                                               :on-change #(do (log/debug "SWAPPING!" %) (swap! data assoc name' %))]]])
+                            [rc-core/checkbox  :model (or (get-in @data name') false)
+                                               :on-change #(do (log/debug "SWAPPING!" %) (swap! data assoc-in name' %))]]])
 
 (defn make-form-field-maker [data errors]
   (let [default-opts {:type :input}] ;atom atom]
