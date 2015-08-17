@@ -250,14 +250,19 @@
   (merge Visit VisitAdditionalAttributes))
 
 (def VisitCreateRequest
-  VisitAttributes)
+  (merge VisitAttributes
+         {:prescriptions [{:medicines [EntityReference]
+                           :is-chronic-disease schema/Bool}]}))
 
 (def VisitCreateResponse
   (schema/either Visit
                  (errors-response VisitCreateRequest)))
 
 (def VisitUpdateRequest
-  (merge VisitAttributes VisitAdditionalAttributes))
+  (merge VisitAttributes
+         {:prescriptions [{(schema/optional-key :id) EntityId
+                           :medicines [EntityReference]
+                           :is-chronic-disease schema/Bool}]}))
 
 (def VisitUpdateResponse
   (schema/either (merge Visit VisitAdditionalAttributes)

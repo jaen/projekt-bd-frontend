@@ -73,7 +73,7 @@
           [:li [:a {:href (routes/app-path-for :appointments/list)} (l18n/t :header/appointments)]]])]]])
 
 (defn main-component []
-  [:div.container {:style {:flex "1 1 0px" :padding "70px 0px 20px 0px"}}
+  [:div.container {:style {:display "flex" :flex-grow 1 :flex-direction "column" :padding "70px 0px 20px 0px"}}
    (if @api/logged-in?
      (match @logic/current-page
             :home/dashboard  [dashboard/dashboard-component]

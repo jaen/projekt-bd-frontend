@@ -43,7 +43,7 @@
                ;(log/debug "appointments" @appointments)
                                     (doall (for [appointment @appointments]
                                              ^{:key (ui-utils/key-for appointment)}
-                                             [:tr [:td (ui-utils/date->str (:date appointment))]
+                                             [:tr [:td (ui-utils/datetime->str (:date appointment))]
                                                   [:td
                                                    (let [employee (:employee appointment)]
                                                      [:a {:href (routes/app-path-for :employees/show :id (:id employee))}
@@ -72,7 +72,7 @@
                                                                          (routes/app-path-for :appointments/edit :id appointment-id))}
                                                                 "Edit appointment"]]]
             [:div [:div.row [:div.col-lg-3 [:b "Date"] [:br]
-                                           (ui-utils/date->str (:date @appointment))]
+                                           (ui-utils/datetime->str (:date @appointment))]
                             [:div.col-lg-3 [:b "Employee"] [:br]
                                            (person->str (:employee @appointment))]
                             [:div.col-lg-3 [:b "Patient"] [:br]
@@ -90,6 +90,7 @@
                       [:div.row
                         [:div.col-lg-12 [:b "Prescriptions"] [:br][:br]
                           (doall (for [prescription prescriptions]
+                                   ^{:key (str "prescription-" (:id prescription))}
                                    [:div.row
                                      [:div.col-lg-12
                                       [:div.panel.panel-default
@@ -105,6 +106,7 @@
                                                                   #_[:th {:style {:width "200px"}} "Actions"]]
                                          [:tbody
                                            (doall (for [medicine (:medicines prescription)]
+                                                    ^{:key (str "prescription-" (:id prescription) "-medicine-" (:id medicine))}
                                               [:tr
                                                [:td (:gtin medicine)]
                                                [:td (if (:approved medicine) "approved" "not approved")]
@@ -310,7 +312,7 @@
                  ^{:key (ui-utils/key-for appointment)}
                  [:div.appointment (str appointment)]))]]
      [:div.row
-      [:div.col-lg-5 [form-input :description #_{:type :textarea}]]]
+      [:div.col-lg-5 [form-input :description {:type :text-area}]]]
      [:div.row
        [:div.col-lg-12 [:b "Prescriptions"] [:br]
         (concat
@@ -318,7 +320,9 @@
                  (for [[idx prescription] (map vector (range) (:prescriptions @appointment))]
                    ^{:key (str "prescription-appointment-" idx)}
                    [:div.panel.panel-default
-                     [:div.panel-heading "hurr"]
+                     [:div.panel-heading "Prescription" [:div.pull-right.close [:a {:on-click (fn [e]
+                                                                                                (swap! appointment update-in [:prescriptions] vec-remove idx)
+                                                                                                (.preventDefault e)) } "X"]]]
                      [:div.panel-body
                       [:table.table.table-hover [:thead [:th "GTIN"]
                                                  [:th "Approved"]
@@ -346,11 +350,15 @@
                                                                                  (.preventDefault e)) }
                                         "Remove"]]])))]]
                       #_[:div "Addd shit"]
+                      (let [model (reagent/atom {})]
                       [form-input (str "prescription-appointment-" idx "-add-medicine")
-                        {:model (reagent/atom {:id 1})
+                        {:model model
                                             :on-change (fn [medicine-id]
-                                                         (log/error "WELP" medicine-id)
-                                                         (swap! appointment update-in [:prescriptions idx :medicines] conj {:id medicine-id}))
+                                                         ;(log/error "WELP" medicine-id)
+                                                         (when medicine-id
+                                                           (swap! appointment update-in [:prescriptions idx :medicines] conj {:id medicine-id})
+                                                           (reset! model {})
+                                                           (log/warn "MODEL" model)))
                                             :label-fn (fn [medicine]
                                                         [:div.clearfix
                                                          [:div [:i.pull-right (:gtin medicine)]
@@ -365,14 +373,14 @@
                                                          ]
                                                         #_[:div.clearfix [:span (str (:firstname patient) " " (:surname patient))]
                                                          [:span.pull-right.text-muted.text-right (ui-utils/address-for patient)]])
-                                            :selected-label-fn (fn [medicine] (:name medicine))
+                                            :selected-label-fn (fn [medicine] "" #_(:name medicine))
                                             :type :select
-                                            :choices medicines}]
+                                            :choices medicines}])
                       ]])))
           [:div
             [:a.btn.btn-primary.btn-info {:on-click (fn [e]
                                                       (swap! appointment update-in [:prescriptions] (comp vec conj) empty-prescription)
-                                                      (.preventDefault e)) } "Add another prescription"]]]]
+                                                      (.preventDefault e)) } "Add a prescription"]]]]
      [:a.btn.btn-success {:on-click on-submit} submit-button-text]])))
 
 (def empty-appointment
@@ -383,6 +391,7 @@
   (let [appointment (reagent/atom empty-appointment)
         errors  (reagent/atom {})
         on-submit (fn [e]
+                    ;(log/warn "APPOINTMENT" @appointment)
                     (api/create-appointment @appointment
                                         (fn [result]
                                           (match result
@@ -401,11 +410,22 @@
       [:div "appointment create form"
        [appointment-form-fields-component appointment errors {:on-submit on-submit :submit-button-text "Create"}]])))
 
+(defn censor-appointment [appointment]
+  ;(log/error "APPOINTMENT IS" appointment)
+  (let [censored (merge  (dissoc appointment :icd10) {:prescriptions (mapv (fn [prescription]
+                                            (update (select-keys prescription [:id :is-chronic-disease :medicines])
+                                                    :medicines (fn [medicines]
+                                                                              (mapv #(select-keys % [:id])
+                                                                                   medicines))))
+                                           (:prescriptions appointment))})]
+    ;(log/error "CENSORED APPOINTMENT IS" censored)
+    censored))
+
 (defn appointment-edit-form-component []
   (let [appointment-id (:id @logic/current-params)
         appointment (reagent/atom {})
         errors  (reagent/atom {})
-        on-submit (fn [e] (api/update-appointment @appointment
+        on-submit (fn [e] (api/update-appointment (censor-appointment @appointment)
                                               (fn [result]
                                                 (match result
                                                        [:success ({:id id} :as response)] (do

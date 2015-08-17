@@ -18,6 +18,11 @@
     (time-format/unparse (time-format/formatter "yyyy-MM-dd") date)
     ""))
 
+(defn datetime->str [date]
+  (if date
+    (time-format/unparse (time-format/formatter "dd-MM-yyyy HH:mm") date)
+    ""))
+
 (defn- node-has-parent-pred? [node pred]
   (loop [node (.-parentNode node)]
     (if (not= node js/document)
@@ -65,7 +70,7 @@
   [rc-core/v-box :class    "form-group"
    :children [[:label #_{:for "login-form-login"} (or (:label opts) (labelize name'))]
               [rc-core/input-text :model (or (get-in @data name') "")
-                                  :on-change   #(swap! data assoc name' %)
+                                  :on-change   #(swap! data assoc-in name' %)
                                   ;:placeholder "Enter login"
                                   :class       "form-control"
                                   :width "100%"
@@ -76,11 +81,26 @@
                                      :style {:padding-top "10px"}
                                      :class "text-danger"])]])
 
+(defmethod form-field-component :text-area [name' {:keys [data errors] :as opts}]
+  [rc-core/v-box :class    "form-group"
+   :children [[:label #_{:for "login-form-login"} (or (:label opts) (labelize name'))]
+              [rc-core/input-textarea :model (or (get-in @data name') "")
+               :on-change   #(swap! data assoc-in name' %)
+               ;:placeholder "Enter login"
+               :class       "form-control"
+               :width "100%"
+               :status      (when (get-in @errors name') :error)
+               ;:attr        {:id "login-form-login"}
+               ]
+              (when (get-in @errors name') [rc-core/label :label (str/join ", " (name' @errors))
+                                            :style {:padding-top "10px"}
+                                            :class "text-danger"])]])
+
 (defmethod form-field-component :password [name' {:keys [data errors] :as opts}]
   [rc-core/v-box :class    "form-group"
    :children [[:label #_{:for "login-form-login"} (or (:label opts) (labelize name'))]
               [rc-core/input-text :model (or (get-in @data name') "")
-                                  :on-change   #(swap! data assoc name' %)
+                                  :on-change   #(swap! data assoc-in name' %)
                                   ;:placeholder "Enter login"
                                   :class       "form-control"
                                   :width "100%"
@@ -100,7 +120,7 @@
                                         :selected-label-fn selected-label-fn
                                         :width "100%"
                                         :filter-box? true
-                                        :on-change (or on-change #(swap! data assoc name' %))]
+                                        :on-change (or on-change #(swap! data assoc-in name' %))]
               (when (get-in @errors name') [rc-core/label :label (str/join ", " (name' @errors))
                                                    :style {:padding-top "10px"}
                                                    :class "text-danger"])]])
@@ -114,7 +134,7 @@
                :disabled-dates (or disabled-dates (atom []))
                :marked-dates (or marked-dates (atom []))
                ;:style {:width "100%"}
-               :on-change (or on-change #(swap! data assoc name' %))]
+               :on-change (or on-change #(swap! data assoc-in name' %))]
               (when (get-in @errors name') [rc-core/label :label (str/join ", " (name' @errors))
                                      :style {:padding-top "10px"}
                                      :class "text-danger"])]])
@@ -127,7 +147,7 @@
                :class   (str/join " " [(when (get-in @errors name') "has-error")])
                :show-icon? true
                ;:style {:width "100%"}
-               :on-change (or on-change #(swap! data assoc name' %))]
+               :on-change (or on-change #(swap! data assoc-in name' %))]
               (when (get-in @errors name') [rc-core/label :label (str/join ", " (name' @errors))
                                      :style {:padding-top "10px"}
                                      :class "text-danger"])]])
