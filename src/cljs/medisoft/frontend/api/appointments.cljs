@@ -9,7 +9,7 @@
 
 (defn list [{:keys [filter]} callback]
   (if (some? filter)
-    (core/api-call :get
+    (core/api-call :post
                    (routes/server-path-for :api.appointments/list-filtered)
                    {:params      {:filter filter}
                     :schema      {;:request  schemas/VisitListQuery

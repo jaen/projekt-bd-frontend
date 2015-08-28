@@ -93,22 +93,48 @@
                              x))
                    response)))
 
-(defn wrap-handler [handler & [response-schema method uri]]
+(def ^:private response-cache (atom {}))
+
+(defn should-cache? [uri method params]
+  (or (= method :get)
+      (and (= method :post) (str/contains? uri "/filter"))))
+
+(defn cache! [uri method params response]
+  ;(log/warn "PUTTING IN CACHE" uri method params)
+  (when (should-cache? uri method params)
+    (log/warn "CACHING" uri method)
+    (swap! response-cache assoc [uri method params] response)))
+
+(defn cache-get [uri method params]
+  ;(log/debug "CURRENT CACHE" @response-cache)
+  (if-let [cached (get @response-cache [uri method params])]
+    (do
+      (log/warn "CACHE HIT" uri method)
+      cached)
+    (do
+      (log/error "CACHE MISS" uri method))))
+
+(defn wrap-handler [handler & [response-schema method uri params]]
   (let [coercer (when response-schema (schema-coerce/coercer response-schema response-coercer))]
     (fn [response]
       (if coercer
-        (let [coerced-response (coercer (let [a (cond
+        ;(.requestAnimationFrame js/window (fn []
+        (let [;_(log/error "BEFORE COERCE" (time/now))
+              coerced-response (coercer (let [a (cond
                                                   (vector? response) (mapv api-response->map response) ; TODO: think of something more general maybe?
                                                   :else              (api-response->map response))]
                                           ;(log/warn "got this after transform:" a)
                                           a))]
+          ;(log/error "AFTER COERCE" (time/now))
           (if-not (schema-utils/error? coerced-response)
             (do
               ;(log/debug (str "SUCCESS - " method " " uri) coerced-response)
+              (cache! uri method params coerced-response)
               (handler [:success coerced-response]))
-            (throw (schema.utils/error-val coerced-response)) #_(ex/raise :response-validation-failed coerced-response)))
+            (throw (schema.utils/error-val coerced-response)) #_(ex/raise :response-validation-failed coerced-response)));))
         (do
           ;(log/debug (str "SUCCESS - " method " " uri) response)
+          (cache! uri method params response)
           (handler [:success response]))))))
 
 ;(defn wrap-error-handler [handler]
@@ -154,14 +180,15 @@
         auth-headers                (when-let [token @api-token]
                                       {:headers {"X-Auth-Token" token}})
         response-fn                 (or (:response-fn opts) #())
-        method-str                  (str/upper (name method))
-        wrapped-handler             (wrap-handler response-fn response-schema method-str uri)
-        wrapped-error-handler       (wrap-error-handler response-fn response-schema method-str uri)
+        ; method-str                  (str/upper (name method))
+        original-params             (or (:params opts) {})
+        wrapped-handler             (wrap-handler response-fn response-schema method uri original-params)
+        wrapped-error-handler       (wrap-error-handler response-fn response-schema method uri)
         handlers                    (into {} (filter second {:handler wrapped-handler :error-handler wrapped-error-handler}))
         format                      {:format :json ;(ajax/transit-request-format {:handlers transit-utils/transit-write-handlers})
                                      :response-format :json
                                      :keywords? false} ;(ajax/detect-response-format {:response-format my-default-formats})}
-        original-params             (or (:params opts) {})
+
         ;params                      {:params (map->api-request original-params)}
         api-opts                    (merge (merge-with merge (dissoc opts :schema) auth-headers)
                                            handlers format)]
@@ -176,6 +203,8 @@
     (let [transformed-params (map->api-request original-params)
           api-opts           (merge api-opts {:params transformed-params})]
       ;(log/debug "coerced api-opts:" api-opts)
+      (when-let [cached (cache-get uri method original-params)]
+        (response-fn [:success cached]))
       (match method
              :get  (ajax/GET  uri api-opts)
              :post (ajax/POST uri api-opts)

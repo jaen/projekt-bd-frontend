@@ -56,13 +56,15 @@
         [:hr]
         [:div.row
          [:div.col-lg-12 [:b "Devices"] [:br]
-          [:table.table.table-hover [:thead [:th "Number"]
+          [:table.table.table-hover [:thead [:th "Serial"]
+                                     [:th "Producer"]
                                      [:th {:style {:width "200px"}} "Actions"]]
             (doall (for [device (:devices @room)]
                    ^{:key (ui-utils/key-for device)}
-                   [:tr [:td (:number room)]
-                    [:td [:a.btn.btn-primary {:href (routes/app-path-for :rooms/show :id (:id room))} (l18n/t :common/show)]
-                     [:a.btn.btn-primary {:href (routes/app-path-for :rooms/edit :id (:id room))} (l18n/t :common/edit)]]]))]]]]])))
+                   [:tr [:td (:serial device)]
+                        [:td (:producer device)]
+                    [:td [:a.btn.btn-primary {:href (routes/app-path-for :devices/show :id (:id device))} (l18n/t :common/show)]
+                         #_[:a.btn.btn-primary {:href (routes/app-path-for :rooms/edit :id (:id room))} (l18n/t :common/edit)]]]))]]]]])))
 
 (def empty-room
   {:number ""})

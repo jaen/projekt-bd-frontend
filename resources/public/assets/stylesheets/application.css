@@ -11848,8 +11848,15 @@ footer > .container .text-muted {
 
 .rc-datepicker td.marked {
   color: #d9534f;
+  font-weight: bold;
 }
 
+table.table-appointments td.taken {
+  background-color: #F7C3C2;
+}
+table.table-appointments td.chosen {
+  background-color: #ACE4AD;
+}
 table.table-appointments td.free {
   padding: 0px;
 }

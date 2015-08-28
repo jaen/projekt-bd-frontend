@@ -199,15 +199,15 @@
         appointments (reagent/atom [])
         appointments-for-day (ratom/reaction (let [day (:date @appointment)]
                                                (filter (fn [appointment] (utils/same-day? day (:date appointment))) @appointments)))
-        medicines (reagent/atom [])]
-    (let [params (if-let [employee-id (get-in @appointment [:employee :id])]
-                   {:filter {:eq {:employee {:id employee-id}}}}
-                   {})]
-       (api/list-appointments params (fn [result] (match result
-                                                     [:success response] (do
-                                                                           (reset! appointments response)
-                                                                           (log/debug "received response" response))
-                                                     [:error   _] :nothing))))
+        medicines (reagent/atom [])
+        update-appointments-fn (fn []
+                                 (if-let [employee-id (get-in @appointment [:employee :id])]
+                                   (api/list-appointments {:filter {:eq {:employee.id employee-id}}}
+                                                          (fn [result] (match result
+                                                                                     [:success response] (do
+                                                                                                           (reset! appointments response)
+                                                                                                           (log/debug "received response" response))
+                                                                                     [:error   _] :nothing)))))]
     (api/list-patients {} (fn [result] (match result
                                               [:success response] (do
                                                                     (reset! patients response)
@@ -230,7 +230,9 @@
     [:form
      [:div.row
       [:div.col-lg-5 [form-input :employee {:model (ratom/reaction (get-in @appointment [:employee :id]))
-                                            :on-change #(swap! appointment update-in [:employee] assoc :id %)
+                                            :on-change #(do
+                                                         (swap! appointment update-in [:employee] assoc :id %)
+                                                         (update-appointments-fn))
                                             :label-fn (fn [employee]
                                                         [:div.clearfix [:span (str (:firstname employee) " " (:surname employee))]
                                                          [:span.pull-right.text-muted.text-right (ui-utils/address-for employee)]])
@@ -251,7 +253,8 @@
      [:div.row
       [:div.col-lg-5 [form-input :date {:type :date ; :date-time
                                         :model appointment-date
-                                        :marked-dates (ratom/reaction (map :date (filter #(if-let [employee-id (get-in @appointment [:employee :id])]
+                                        :marked-dates (ratom/reaction (map :date @appointments))
+                                        #_(ratom/reaction (map :date (filter #(if-let [employee-id (get-in @appointment [:employee :id])]
                                           (= (get-in % [:employee :id])
                                               employee-id)
                                           true) @appointments)))
@@ -279,11 +282,11 @@
                                                       ]]
                                          (if (= (time-key window) (time-key @appointment-date))
                                            ^{:key (str "window-appointment-" (time-key window))}
-                                           [:td.text-center.text-success "yours"]
+                                           [:td.text-center.text-success.chosen "yours"]
 
                                            (if-let [appointment (get appointments-by-date key)]
                                              ^{:key (str "window-appointment-" (time-key window))}
-                                             [:td.text-center.text-danger "taken"]
+                                             [:td.text-center.text-danger.taken "taken"]
 
                                              ^{:key (str "window-appointment-" (time-key window))}
                                              [:td.text-muted.text-center.free

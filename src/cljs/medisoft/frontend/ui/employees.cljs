@@ -15,7 +15,11 @@
             [medisoft.frontend.log :as log]
             [medisoft.frontend.validations :as validations]
             [medisoft.frontend.routes :as routes]
-            [medisoft.frontend.history :as history]))
+            [medisoft.frontend.history :as history]
+            [cljs-time.core :as time]
+            [medisoft.frontend.ui.datepicker :as datepicker]
+            [medisoft.frontend.utils :as utils]
+            [cljs-time.format :as time-format]))
 
 (defn address-for-employee [patient]
   [:span (:street-name patient) " " (:house-number patient) "/" (:flat-number patient) [:br]
@@ -46,14 +50,32 @@
                      [:a.btn.btn-primary {:href (routes/app-path-for :employees/edit :id (:id employee))} "Edit"]]]))]
          [:div "No employees to display."])])))
 
+(defn time-key [time]
+  (str (time/hour time) "-" (time/minute time)))
+
+(defn person->str [employee]
+  (str (:firstname employee) " " (:surname employee)))
+
 (defn employee-show-component []
   (let [employee-id (:id @logic/current-params)
-        employee    (reagent/atom {})]
+        employee    (reagent/atom {})
+        appointments (reagent/atom {})
+        appointment-date (reagent/atom (time/now))
+        marked-dates (ratom/reaction (map :date @appointments))
+        appointments-for-day (ratom/reaction
+                               (log/error "DAY CHANGED" @appointment-date) ;; FIXME: this deref is needed for this to work
+                               (filter (fn [appointment] (utils/same-day? @appointment-date (:date appointment))) @appointments))]
     (api/get-employee {:id employee-id} (fn [result] (match result
                                                           [:success response] (do
                                                                                 (reset! employee response)
                                                                                 (log/debug "received response" response))
                                                           [:error   response] (log/debug "received response" response))))
+    (api/list-appointments {:filter {:eq {:employee.id employee-id}}}
+                           (fn [result] (match result
+                                               [:success response] (do
+                                                                     (reset! appointments response)
+                                                                     (log/debug "received response" response))
+                                               [:error   _] :nothing)))
     (fn []
       [:div [:div.clearfix [:div.pull-right [:a.btn.btn-primary {:href (if-let [patient-id (:id @employee)]
                                                                          (routes/app-path-for :employees/edit :id patient-id))}
@@ -63,7 +85,50 @@
         [:div.row [:div.col-lg-3 [:b "Personal ID"] [:br]
                    (:personal-id @employee)]
          [:div.col-lg-3 [:b "Address"] [:br]
-          (address-for-employee @employee)]]]])))
+          (address-for-employee @employee)]]]
+       [:div [:h2 "Wizyty"]
+        [:hr]
+        [:div.row
+          [:div.col-lg-2
+           [datepicker/datepicker
+            :model   appointment-date
+            :marked-dates marked-dates
+            ;:style {:width "100%"}
+            :on-change (fn [new-date]
+                         (let [old-date @appointment-date]
+                           ; (log/debug "old:" old)
+                           (let [int-time (ui-utils/datetime->int old-date)
+                                 new-date (ui-utils/update-datetime-time new-date int-time)]
+                             (log/debug "new:" new-date)
+                             (reset! appointment-date new-date)
+                             (log/error "APP DATE:" @appointment-date)
+                             )))
+
+            #_(or on-change #(swap! data assoc name' %))]]
+          [:div.col-lg-10
+           (let [appointments-by-date (into {} (map (fn [appointment] [(time-key (:date appointment)) appointment]) @appointments-for-day))
+                 appointments (take 24 (iterate #(time/plus % (time/minutes 30)) (time/plus (time/at-midnight @appointment-date)
+                                                                                            (time/hours 6))))]
+             ;(log/debug "BY DATE" appointments-by-date)
+             #_(log/debug "TEST" (time-key (time/plus (time/at-midnight @appointment-date)
+                                                      (time/hours 14)) ))
+             #_(log/debug "TEST" (get appointments-by-date (time-key (time/plus (time/at-midnight @appointment-date)
+                                                                                (time/hours 14)) )))
+             [:table.table.table-appointments.table-striped.table-hover
+               [:tbody
+                (doall (for [window appointments
+                             :let [appointment (get appointments-by-date (time-key window))]]
+                         ^{:key (str "window-header-" (time-key window))}
+                         [:tr
+                           [:td.text-center {:style {:font-weight "bold" :width "180px"}}
+                            (if appointment
+                              [:a {:href (routes/app-path-for :appointments/show :id (:id appointment))}
+                                (time-format/unparse (time-format/formatter "HH:mm") window)]
+                              (time-format/unparse (time-format/formatter "HH:mm") window))]
+                           [:td (when-let [patient (:patient appointment)]
+                                      [:a {:href (routes/app-path-for :patients/show :id (:id patient))}
+                                       (person->str patient)])]
+                           #_[:td "show"]]))]])]]]])))
 
 (defn employee-form-fields-component [employee errors {:keys [on-submit submit-button-text] :as opts}]
   (let [job-titles (reagent.core/atom [])

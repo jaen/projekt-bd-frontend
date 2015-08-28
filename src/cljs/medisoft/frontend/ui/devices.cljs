@@ -55,7 +55,9 @@
                     [:tr
                       [:td (:serial device)]
                       [:td (:producer device)]
-                      [:td "NVM" #_(:number @room)]
+                      [:td (let [room (:room device)]
+                             [:a {:href (routes/app-path-for :rooms/show :id (:id room))}
+                              (:number room)])]
                       [:td (ui-utils/date->str (:purchase-date device))]
                       [:td (ui-utils/date->str (:warranty-date device))]
                       [:td
@@ -86,7 +88,9 @@
            [:div.col-lg-4 [:b "Warranty date"] [:br] (ui-utils/date->str (:warranty-date @device))]]
          [:br]
          [:div.row
-          [:div.col-lg-4 [:b "Room"] [:br] "NVM"]]]])))
+          [:div.col-lg-4 [:b "Room"] [:br] (when-let [room (:room @device)]
+                                             [:a {:href (routes/app-path-for :rooms/show :id (:id room))}
+                                              (:number room)])]]]])))
 
 (defn device-form-fields-component [device errors {:keys [on-submit submit-button-text] :as opts}]
   (let [form-input (ui-utils/make-form-field-maker device errors)

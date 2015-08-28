@@ -142,7 +142,7 @@
 (defn- table-td
   [date focus-month selected today {minimum :minimum maximum :maximum disabled-dates :disabled-dates marked-dates :marked-dates :as attributes} disabled? on-change]
   ;;following can be simplified and terse
-  (log/error "FUCKING SHIT" attributes)
+  ;(log/error "FUCKING SHIT" attributes)
   (let [enabled-min   (if minimum (>=date date minimum) true)
         enabled-max   (if maximum (<=date date maximum) true)
         enabled-day   (and enabled-min enabled-max)

@@ -65,12 +65,21 @@ footer {
 .rc-datepicker {
   td.marked {
     color: $brand-danger;
+    font-weight: bold;
   }
 }
 
 table.table-appointments {
+  td.taken {
+    background-color: #F7C3C2;
+  }
+
+  td.chosen {
+    background-color: #ACE4AD;
+  }
+
   td.free {
-  padding: 0px;
+    padding: 0px;
 
     a {
       padding: 8px;
