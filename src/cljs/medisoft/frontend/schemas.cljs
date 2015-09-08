@@ -215,10 +215,11 @@
 ;; Prescription schemas
 
 (def PrescriptionAttributes
-  {:department schema/Any ; FIXME: add departments
-   :employee  (schema/either (schema/recursive #'Employee) EntityReference RelativeReference)
+  {:employee  (schema/either (schema/recursive #'Employee) EntityReference RelativeReference)
    :patient   (schema/either (schema/recursive #'Patient) EntityReference RelativeReference)
    :medicines [(schema/either (schema/recursive #'Medicine) EntityReference RelativeReference)]
+   (schema/optional-key :department) schema/Any
+   (schema/optional-key :medicine-permission) schema/Any
    :is-chronic-disease schema/Bool
    })
 

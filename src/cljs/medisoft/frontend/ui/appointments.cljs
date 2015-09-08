@@ -34,12 +34,12 @@
     (fn []
       [:div [:div.clearfix [:div.pull-right [:a.btn.btn-success {:href (routes/app-path-for :appointments/create)} (l18n/t :appointments/new-appointment)]]]
             (if (> (count @appointments) 0)
-              [:table.table.table-hover [:thead [:th "Date"]
-                                                [:th "Employee"]
-                                                [:th "Patient"]
+              [:table.table.table-hover [:thead [:th (l18n/t :appointments/date)]
+                                                [:th (l18n/t :appointments/employee)]
+                                                [:th (l18n/t :appointments/patient)]
                                                 ;[:th "Description"]
-                                                [:th "ICD10"]
-                                                [:th {:style {:width "200px"}} "Actions"]]
+                                                [:th (l18n/t :appointments/icd10)]
+                                                [:th {:style {:width "200px"}} (l18n/t :common/actions)]]
                ;(log/debug "appointments" @appointments)
                                     (doall (for [appointment @appointments]
                                              ^{:key (ui-utils/key-for appointment)}
@@ -56,7 +56,7 @@
                                                   [:td (str/join ", " (:icd10 appointment))]
                                                   [:td [:a.btn.btn-primary {:href (routes/app-path-for :appointments/show :id (:id appointment))} (l18n/t :common/show)]
                                                        [:a.btn.btn-primary {:href (routes/app-path-for :appointments/edit :id (:id appointment))} (l18n/t :common/edit)]]]))]
-              [:div "No appointments to display."])])))
+              [:div (l18n/t :appointments/no-appointments)])])))
 
 (defn appointment-show-component []
   (let [appointment-id (:id @logic/current-params)
@@ -70,46 +70,50 @@
       (log/debug "lel" @appointment)
       [:div [:div.clearfix [:div.pull-right [:a.btn.btn-primary {:href (if-let [appointment-id (:id @appointment)]
                                                                          (routes/app-path-for :appointments/edit :id appointment-id))}
-                                                                "Edit appointment"]]]
-            [:div [:div.row [:div.col-lg-3 [:b "Date"] [:br]
+                                             (l18n/t :appointments/edit-appointment)]]]
+            [:div [:div.row [:div.col-lg-3 [:b (l18n/t :appointments/date)] [:br]
                                            (ui-utils/datetime->str (:date @appointment))]
-                            [:div.col-lg-3 [:b "Employee"] [:br]
-                                           (person->str (:employee @appointment))]
-                            [:div.col-lg-3 [:b "Patient"] [:br]
-                                           (person->str (:patient @appointment))]]
+                            [:div.col-lg-3 [:b (l18n/t :appointments/employee)] [:br]
+                                           (when-let [employee (:employee @appointment)]
+                                             [:a {:href (routes/app-path-for :employees/show :id (:id employee))}
+                                                 (person->str employee)])]
+                            [:div.col-lg-3 [:b (l18n/t :appointments/patient)] [:br]
+                                           (when-let [patient (:patient @appointment)]
+                                             [:a {:href (routes/app-path-for :patients/show :id (:id patient))}
+                                                 (person->str patient)])]]
                   [:div.row
-                            [:div.col-lg-3 [:b "ICD10"] [:br]
+                            [:div.col-lg-3 [:b (l18n/t :appointments/icd10)] [:br]
                                            (str/join ", " (:icd10 @appointment))]]
                   [:hr]
                   [:div.row
-                            [:div.col-lg-12 [:b "Description"] [:br]
+                            [:div.col-lg-12 [:b (l18n/t :appointments/description)] [:br]
                                            (:description @appointment)]]
                   [:hr]
                   (let [prescriptions (:prescriptions @appointment)]
                     (when (not-empty prescriptions)
                       [:div.row
-                        [:div.col-lg-12 [:b "Prescriptions"] [:br][:br]
+                        [:div.col-lg-12 [:b (l18n/t :appointments/prescriptions)] [:br][:br]
                           (doall (for [prescription prescriptions]
                                    ^{:key (str "prescription-" (:id prescription))}
                                    [:div.row
                                      [:div.col-lg-12
                                       [:div.panel.panel-default
-                                       [:div.panel-heading "Some prescription"]
+                                       [:div.panel-heading (l18n/t :appointments/prescription)]
                                        [:div.panel-body
-                                       [:table.table.table-hover [:thead [:th "GTIN"]
-                                                                  [:th "Approved"]
-                                                                  [:th "Name"]
-                                                                  [:th "Producer"]
-                                                                  [:th "Type"]
-                                                                  [:th "Wrapping"]
-                                                                  [:th "Dose"]
+                                       [:table.table.table-hover [:thead [:th (l18n/t :medicines/gtin)]
+                                                                  [:th (l18n/t :medicines/approved)]
+                                                                  [:th (l18n/t :medicines/name)]
+                                                                  [:th (l18n/t :medicines/producer-name)]
+                                                                  [:th (l18n/t :medicines/type)]
+                                                                  [:th (l18n/t :medicines/wrapping)]
+                                                                  [:th (l18n/t :medicines/dose)]
                                                                   #_[:th {:style {:width "200px"}} "Actions"]]
                                          [:tbody
                                            (doall (for [medicine (:medicines prescription)]
                                                     ^{:key (str "prescription-" (:id prescription) "-medicine-" (:id medicine))}
                                               [:tr
                                                [:td (:gtin medicine)]
-                                               [:td (if (:approved medicine) "approved" "not approved")]
+                                               [:td (if (:approved medicine) (l18n/t :medicines/is-approved) (l18n/t :medicines/is-not-approved))]
                                                [:td (:name medicine)]
                                                [:td (:producer-name medicine)]
                                                [:td (:type medicine)]
@@ -192,7 +196,7 @@
 
 (defn appointment-form-fields-component [appointment errors {:keys [on-submit submit-button-text] :as opts}]
   (let [cnt-atom (atom 0)
-        form-input (ui-utils/make-form-field-maker appointment errors)
+        form-input (ui-utils/make-form-field-maker appointment errors {:l18n-scopes [:appointments]})
         patients (reagent.core/atom [])
         employees (reagent.core/atom [])
         appointment-date (ratom/reaction (or (:date @appointment) (time/now)))
@@ -282,11 +286,11 @@
                                                       ]]
                                          (if (= (time-key window) (time-key @appointment-date))
                                            ^{:key (str "window-appointment-" (time-key window))}
-                                           [:td.text-center.text-success.chosen "yours"]
+                                           [:td.text-center.text-success.chosen (l18n/t :appointments/date-yours)]
 
                                            (if-let [appointment (get appointments-by-date key)]
                                              ^{:key (str "window-appointment-" (time-key window))}
-                                             [:td.text-center.text-danger.taken "taken"]
+                                             [:td.text-center.text-danger.taken (l18n/t :appointments/date-taken)]
 
                                              ^{:key (str "window-appointment-" (time-key window))}
                                              [:td.text-muted.text-center.free
@@ -297,7 +301,7 @@
                                                                 ;(update-datetime-time old-date (datetime->int window))
                                                                 (swap! appointment assoc :date window)
                                                                 (.preventDefault e))}
-                                                   "free"]])))))]]]
+                                                (l18n/t :appointments/date-free)]])))))]]]
 
          #_[:table.table
           [:thead [:th {:style {:width 200}} "time"] [:th "patient"]]
@@ -317,24 +321,24 @@
      [:div.row
       [:div.col-lg-5 [form-input :description {:type :text-area}]]]
      [:div.row
-       [:div.col-lg-12 [:b "Prescriptions"] [:br]
+       [:div.col-lg-12 [:b (l18n/t :appointments/prescriptions)] [:br]
         (concat
           (doall
                  (for [[idx prescription] (map vector (range) (:prescriptions @appointment))]
                    ^{:key (str "prescription-appointment-" idx)}
                    [:div.panel.panel-default
-                     [:div.panel-heading "Prescription" [:div.pull-right.close [:a {:on-click (fn [e]
+                     [:div.panel-heading (l18n/t :appointments/prescription) [:div.pull-right.close [:a {:on-click (fn [e]
                                                                                                 (swap! appointment update-in [:prescriptions] vec-remove idx)
                                                                                                 (.preventDefault e)) } "X"]]]
                      [:div.panel-body
-                      [:table.table.table-hover [:thead [:th "GTIN"]
-                                                 [:th "Approved"]
-                                                 [:th "Name"]
-                                                 [:th "Producer"]
-                                                 [:th "Type"]
-                                                 [:th "Wrapping"]
-                                                 [:th "Dose"]
-                                                 [:th {:style {:width "200px"}} "Actions"]]
+                      [:table.table.table-hover [:thead [:th (l18n/t :medicines/gtin)]
+                                                 [:th (l18n/t :medicines/approved)]
+                                                 [:th (l18n/t :medicines/name)]
+                                                 [:th (l18n/t :medicines/producer-name)]
+                                                 [:th (l18n/t :medicines/type)]
+                                                 [:th (l18n/t :medicines/wrapping)]
+                                                 [:th (l18n/t :medicines/dose)]
+                                                 [:th {:style {:width "200px"}} (l18n/t :common/actions)]]
                        [:tbody
                         (doall
                           (for [[idx' {medicine-id :id}] (map vector (range) (:medicines prescription))]
@@ -342,7 +346,7 @@
                             ^{:key (str "prescription-appointment-" idx "-medicine-" idx')}
                                  [:tr
                                   [:td (:gtin medicine)]
-                                  [:td (if (:approved medicine) "approved" "not approved")]
+                                  [:td (if (:approved medicine) (l18n/t :medicines/is-approved) (l18n/t :medicines/is-not-approved))]
                                   [:td (:name medicine)]
                                   [:td (:producer-name medicine)]
                                   [:td (:type medicine)]
@@ -351,7 +355,7 @@
                                   [:td [:a.btn.btn-primary.btn-danger {:on-click (fn [e]
                                                                                  (swap! appointment update-in [:prescriptions idx :medicines] vec-remove idx')
                                                                                  (.preventDefault e)) }
-                                        "Remove"]]])))]]
+                                        (l18n/t :common/remove)]]])))]]
                       #_[:div "Addd shit"]
                       (let [model (reagent/atom {})]
                       [form-input (str "prescription-appointment-" idx "-add-medicine")
@@ -377,18 +381,20 @@
                                                         #_[:div.clearfix [:span (str (:firstname patient) " " (:surname patient))]
                                                          [:span.pull-right.text-muted.text-right (ui-utils/address-for patient)]])
                                             :selected-label-fn (fn [medicine] "" #_(:name medicine))
+                                            :label "dodaj lek"
                                             :type :select
                                             :choices medicines}])
                       ]])))
           [:div
             [:a.btn.btn-primary.btn-info {:on-click (fn [e]
                                                       (swap! appointment update-in [:prescriptions] (comp vec conj) empty-prescription)
-                                                      (.preventDefault e)) } "Add a prescription"]]]]
+                                                      (.preventDefault e)) } (l18n/t :appointments/add-a-prescription)]]]]
      [:a.btn.btn-success {:on-click on-submit} submit-button-text]])))
 
 (def empty-appointment
   {:date        (time/today-at 12 00)
-   :description ""})
+   :description ""
+   :prescriptions []})
 
 (defn appointment-create-form-component []
   (let [appointment (reagent/atom empty-appointment)
@@ -410,8 +416,9 @@
     (fn []
       ;(log/debug "appointment" @appointment)
       ;(log/debug "appointment date" (time-format/unparse (time-format/formatters :rfc822) (:date @appointment)))
-      [:div "appointment create form"
-       [appointment-form-fields-component appointment errors {:on-submit on-submit :submit-button-text "Create"}]])))
+      [:div
+       [:h1 (l18n/t :appointments/create-appointment)]
+       [appointment-form-fields-component appointment errors {:on-submit on-submit :submit-button-text (l18n/t :common/create)}]])))
 
 (defn censor-appointment [appointment]
   ;(log/error "APPOINTMENT IS" appointment)
@@ -450,5 +457,6 @@
                                                                            {:patient (select-keys (:patient response) [:id])})))
                               [:error   {:response ({:errors errors'} :as response)}] (log/error "received response" response))))
     (fn []
-      [:div "patient edit form"
-       [appointment-form-fields-component appointment errors {:on-submit on-submit :submit-button-text "Edit"}]])))
+      [:div
+       [:h1 (l18n/t :appointments/edit-appointment)]
+       [appointment-form-fields-component appointment errors {:on-submit on-submit :submit-button-text (l18n/t :common/edit)}]])))

@@ -131,7 +131,7 @@
               ;(log/debug (str "SUCCESS - " method " " uri) coerced-response)
               (cache! uri method params coerced-response)
               (handler [:success coerced-response]))
-            (throw (schema.utils/error-val coerced-response)) #_(ex/raise :response-validation-failed coerced-response)));))
+            (log/error "RESPONSE VALIDATION FAILED" (schema.utils/error-val coerced-response))))
         (do
           ;(log/debug (str "SUCCESS - " method " " uri) response)
           (cache! uri method params response)
@@ -161,7 +161,7 @@
             (do
               ;(log/error (str "ERROR - " method " " uri) (merge response {:response coerced-response}))
               (handler [:error (merge response {:response coerced-response})]))
-            (throw (schema.utils/error-val coerced-response)) #_(ex/raise :response-validation-failed coerced-response)))
+            (log/error "RESPONSE VALIDATION FAILED" (schema.utils/error-val coerced-response))))
         (do
           ;(log/error (str "ERROR - " method " " uri) response)
           (handler (handler [:error response])))))))
@@ -198,7 +198,8 @@
     ;(when-not response-schema
     ;  (log/warn "no response schema for" method uri))
     (when request-schema
-      (schema/validate request-schema original-params))
+      (when-let [errors (schema/check request-schema original-params)]
+        (log/error "REQUEST VALIDATION FAILED" errors)))
     ;(log/debug "params:" original-params)
     (let [transformed-params (map->api-request original-params)
           api-opts           (merge api-opts {:params transformed-params})]

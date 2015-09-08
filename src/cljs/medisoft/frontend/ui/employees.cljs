@@ -19,7 +19,8 @@
             [cljs-time.core :as time]
             [medisoft.frontend.ui.datepicker :as datepicker]
             [medisoft.frontend.utils :as utils]
-            [cljs-time.format :as time-format]))
+            [cljs-time.format :as time-format]
+            [medisoft.frontend.l18n :as l18n]))
 
 (defn address-for-employee [patient]
   [:span (:street-name patient) " " (:house-number patient) "/" (:flat-number patient) [:br]
@@ -33,22 +34,22 @@
                                                                     (log/debug "received response" response))
                                               [:error   _] :nothing)))
     (fn []
-      [:div [:div.clearfix [:div.pull-right [:a.btn.btn-success {:href (routes/app-path-for :employees/create)} "New employee"]]]
+      [:div [:div.clearfix [:div.pull-right [:a.btn.btn-success {:href (routes/app-path-for :employees/create)} (l18n/t :employees/new-employee)]]]
        (if (> (count @employee) 0)
-         [:table.table.table-hover [:thead [:th "First name"]
-                                    [:th "Surname"]
-                                    [:th "Personal ID"]
-                                    [:th "Address"]
-                                    [:th {:style {:width "200px"}} "Actions"]]
+         [:table.table.table-hover [:thead [:th (l18n/t :personal-information/firstname)]
+                                    [:th (l18n/t :personal-information/surname)]
+                                    [:th (l18n/t :personal-information/personal-id)]
+                                    [:th (l18n/t :personal-information/address)]
+                                    [:th {:style {:width "200px"}} (l18n/t :common/actions)]]
           (doall (for [employee @employee]
                    ^{:key (ui-utils/key-for employee)}
                    [:tr [:td (:firstname employee)]
                     [:td (:surname employee)]
                     [:td (:personal-id employee)]
                     [:td (address-for-employee employee)]
-                    [:td [:a.btn.btn-primary {:href (routes/app-path-for :employees/show :id (:id employee))} "Show"]
-                     [:a.btn.btn-primary {:href (routes/app-path-for :employees/edit :id (:id employee))} "Edit"]]]))]
-         [:div "No employees to display."])])))
+                    [:td [:a.btn.btn-primary {:href (routes/app-path-for :employees/show :id (:id employee))} (l18n/t :common/show)]
+                     [:a.btn.btn-primary {:href (routes/app-path-for :employees/edit :id (:id employee))} (l18n/t :common/edit)]]]))]
+         [:div (l18n/t :employees/no-employees)])])))
 
 (defn time-key [time]
   (str (time/hour time) "-" (time/minute time)))
@@ -79,14 +80,14 @@
     (fn []
       [:div [:div.clearfix [:div.pull-right [:a.btn.btn-primary {:href (if-let [patient-id (:id @employee)]
                                                                          (routes/app-path-for :employees/edit :id patient-id))}
-                                             "Edit employee"]]]
+                                             (l18n/t :employees/edit-employee)]]]
        [:div [:h2 (:firstname @employee) " " (:surname @employee)]
         [:hr]
-        [:div.row [:div.col-lg-3 [:b "Personal ID"] [:br]
+        [:div.row [:div.col-lg-3 [:b (l18n/t :personal-information/personal-id)] [:br]
                    (:personal-id @employee)]
-         [:div.col-lg-3 [:b "Address"] [:br]
+         [:div.col-lg-3 [:b (l18n/t :personal-information/address)] [:br]
           (address-for-employee @employee)]]]
-       [:div [:h2 "Wizyty"]
+       [:div [:h2 (l18n/t :personal-information/appointments)]
         [:hr]
         [:div.row
           [:div.col-lg-2
@@ -132,7 +133,7 @@
 
 (defn employee-form-fields-component [employee errors {:keys [on-submit submit-button-text] :as opts}]
   (let [job-titles (reagent.core/atom [])
-        form-input (ui-utils/make-form-field-maker employee errors)]
+        form-input (ui-utils/make-form-field-maker employee errors {:l18n-scopes [:employees :personal-information]})]
     (api/list-job-titles {} (fn [result] (match result
                                                             [:success response] (do
                                                                                   (reset! job-titles response)
@@ -198,8 +199,9 @@
                                                                                                            (reset! errors errors')))))
                     (.preventDefault e))]
     (fn []
-      [:div "patient create form"
-       [employee-form-fields-component employee errors {:on-submit on-submit :submit-button-text "Create"}]])))
+      [:div
+       [:h1 (l18n/t :employees/create-employee)]
+       [employee-form-fields-component employee errors {:on-submit on-submit :submit-button-text (l18n/t :employees/create-employee)}]])))
 
 (defn employee-edit-form-component []
   (let [employee-id (:id @logic/current-params)
@@ -226,5 +228,6 @@
                                                                                                      :device-reservations :room-reservations :schedules :users)))
                               [:error   {:response ({:errors errors'} :as response)}] (log/error "received response" response))))
     (fn []
-      [:div "patient edit form"
-       [employee-form-fields-component employee errors {:on-submit on-submit :submit-button-text "Edit"}]])))
+      [:div
+       [:h1 (l18n/t :employees/edit-employee)]
+       [employee-form-fields-component employee errors {:on-submit on-submit :submit-button-text (l18n/t :employees/edit-employee)}]])))

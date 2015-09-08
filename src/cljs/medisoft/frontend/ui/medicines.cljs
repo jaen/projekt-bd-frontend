@@ -14,7 +14,8 @@
             [medisoft.frontend.log :as log]
             [medisoft.frontend.validations :as validations]
             [medisoft.frontend.routes :as routes]
-            [medisoft.frontend.history :as history]))
+            [medisoft.frontend.history :as history]
+            [medisoft.frontend.l18n :as l18n]))
 
 (defn medicine-list-component []
   (let [medicines (reagent/atom [])]
@@ -24,28 +25,28 @@
                                                                     (log/debug "received response" response))
                                               [:error   _] :nothing)))
     (fn []
-      [:div [:div.clearfix [:div.pull-right [:a.btn.btn-success {:href (routes/app-path-for :medicines/create)} "New medicine"]]]
+      [:div [:div.clearfix [:div.pull-right [:a.btn.btn-success {:href (routes/app-path-for :medicines/create)} (l18n/t :medicines/new-medicine)]]]
             (if (> (count @medicines) 0)
-              [:table.table.table-hover [:thead [:th "GTIN"]
-                                                [:th "Approved"]
-                                                [:th "Name"]
-                                                [:th "Producer"]
-                                                [:th "Type"]
-                                                [:th "Wrapping"]
-                                                [:th "Dose"]
-                                                [:th {:style {:width "200px"}} "Actions"]]
+              [:table.table.table-hover [:thead [:th (l18n/t :medicines/gtin)]
+                                         [:th (l18n/t :medicines/approved)]
+                                         [:th (l18n/t :medicines/name)]
+                                         [:th (l18n/t :medicines/producer-name)]
+                                         [:th (l18n/t :medicines/type)]
+                                         [:th (l18n/t :medicines/wrapping)]
+                                         [:th (l18n/t :medicines/dose)]
+                                         [:th {:style {:width "200px"}} (l18n/t :common/actions)]]
                                     (doall (for [medicine @medicines]
                                              ^{:key (ui-utils/key-for medicine)}
                                              [:tr [:td (:gtin medicine)]
-                                                  [:td (if (:approved medicine) "approved" "not approved")]
+                                                  [:td (if (:approved medicine) (l18n/t :medicines/is-approved) (l18n/t :medicines/is-not-approved))]
                                                   [:td (:name medicine)]
                                                   [:td (:producer-name medicine)]
                                                   [:td (:type medicine)]
                                                   [:td (:wrapping medicine)]
                                                   [:td (:dose medicine)]
-                                                  [:td [:a.btn.btn-primary {:href (routes/app-path-for :medicines/show :id (:id medicine))} "Show"]
-                                                       [:a.btn.btn-primary {:href (routes/app-path-for :medicines/edit :id (:id medicine))} "Edit"]]]))]
-              [:div "No medicines to display."])])))
+                                                  [:td [:a.btn.btn-primary {:href (routes/app-path-for :medicines/show :id (:id medicine))} (l18n/t :common/show)]
+                                                       [:a.btn.btn-primary {:href (routes/app-path-for :medicines/edit :id (:id medicine))} (l18n/t :common/edit)]]]))]
+              [:div (l18n/t :medicines/no-medicines)])])))
 
 (defn medicine-show-component []
   (let [medicine-id (:id @logic/current-params)
@@ -58,23 +59,23 @@
     (fn []
       [:div [:div.clearfix [:div.pull-right [:a.btn.btn-primary {:href (if-let [medicine-id (:id @medicine)]
                                                                          (routes/app-path-for :medicines/edit :id medicine-id))}
-                                                                "Edit medicine"]]]
+                                             (l18n/t :medicines/edit-medicine)]]]
             [:div [:h2 (:name @medicine) " " [:small (:gtin @medicine)]]
                   [:hr]
-                  [:div.row [:div.col-lg-3 [:b "Is Approved"] [:br]
-                                           (if (:approved @medicine) "approved" "not approved")]
-                            [:div.col-lg-3 [:b "Producer"] [:br]
+                  [:div.row [:div.col-lg-3 [:b (l18n/t :medicines/approved)] [:br]
+                             (if (:approved medicine) (l18n/t :medicines/is-approved) (l18n/t :medicines/is-not-approved))]
+                            [:div.col-lg-3 [:b (l18n/t :medicines/producer-name)] [:br]
                                            (:producer-name @medicine)]]
                   [:br]
-                  [:div.row [:div.col-lg-3 [:b "Type"] [:br]
+                  [:div.row [:div.col-lg-3 [:b (l18n/t :medicines/type)] [:br]
                                            (:type @medicine)]
-                            [:div.col-lg-3 [:b "Wrapping"] [:br]
+                            [:div.col-lg-3 [:b (l18n/t :medicines/wrapping)] [:br]
                                            (:wrapping @medicine)]
-                            [:div.col-lg-3 [:b "Dose"] [:br]
+                            [:div.col-lg-3 [:b (l18n/t :medicines/dose)] [:br]
                                            (:dose @medicine)]]]])))
 
 (defn medicine-form-fields-component [medicine errors {:keys [on-submit submit-button-text] :as opts}]
-  (let [form-input (ui-utils/make-form-field-maker medicine errors)]
+  (let [form-input (ui-utils/make-form-field-maker medicine errors {:l18n-scopes [:medicines]})]
     [:form
      [:div.row
       [:div.col-lg-5 [form-input :name]]
@@ -121,8 +122,9 @@
                                                                                                            (reset! errors errors')))))
                     (.preventDefault e))]
     (fn []
-      [:div "patient create form"
-       [medicine-form-fields-component medicine errors {:on-submit on-submit :submit-button-text "Create"}]])))
+      [:div
+       [:h2 (l18n/t :medicines/create-medicine)]
+       [medicine-form-fields-component medicine errors {:on-submit on-submit :submit-button-text (l18n/t :medicines/create-medicine)}]])))
 
 (defn medicine-edit-form-component []
   (let [medicine-id (:id @logic/current-params)
@@ -148,5 +150,6 @@
                                                                    (reset! medicine (dissoc response :class :medical-visits :prescription)))
                               [:error   {:response ({:errors errors'} :as response)}] (log/error "received response" response))))
     (fn []
-      [:div "patient edit form"
-       [medicine-form-fields-component medicine errors {:on-submit on-submit :submit-button-text "Edit"}]])))
+      [:div
+       [:h2 (l18n/t :medicines/edit-medicine)]
+       [medicine-form-fields-component medicine errors {:on-submit on-submit :submit-button-text (l18n/t :medicines/edit-medicine)}]])))

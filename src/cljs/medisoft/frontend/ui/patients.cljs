@@ -15,7 +15,8 @@
             [cljs-time.core :as time]
             [medisoft.frontend.validations :as validations]
             [medisoft.frontend.routes :as routes]
-            [medisoft.frontend.history :as history]))
+            [medisoft.frontend.history :as history]
+            [medisoft.frontend.l18n :as l18n]))
 
 (defn person->str [employee]
   (str (:firstname employee) " " (:surname employee)))
@@ -32,22 +33,22 @@
                                                                     (log/debug "received response" response))
                                               [:error   _] :nothing)))
     (fn []
-      [:div [:div.clearfix [:div.pull-right [:a.btn.btn-success {:href (routes/app-path-for :patients/create)} "New patient"]]]
+      [:div [:div.clearfix [:div.pull-right [:a.btn.btn-success {:href (routes/app-path-for :patients/create)} (l18n/t :patients/new-patient)]]]
             (if (> (count @patients) 0)
-              [:table.table.table-hover [:thead [:th "First name"]
-                                                [:th "Surname"]
-                                                [:th "Personal ID"]
-                                                [:th "Address"]
-                                                [:th {:style {:width "200px"}} "Actions"]]
+              [:table.table.table-hover [:thead [:th (l18n/t :personal-information/firstname)]
+                                         [:th (l18n/t :personal-information/surname)]
+                                         [:th (l18n/t :personal-information/personal-id)]
+                                         [:th (l18n/t :personal-information/address)]
+                                         [:th {:style {:width "200px"}} (l18n/t :common/actions)]]
                                     (doall (for [patient @patients]
                                              ^{:key (ui-utils/key-for patient)}
                                              [:tr [:td (:firstname patient)]
                                                   [:td (:surname patient)]
                                                   [:td (:personal-id patient)]
                                                   [:td (address-for-patient patient)]
-                                                  [:td [:a.btn.btn-primary {:href (routes/app-path-for :patients/show :id (:id patient))} "Show"]
-                                                       [:a.btn.btn-primary {:href (routes/app-path-for :patients/edit :id (:id patient))} "Edit"]]]))]
-              [:div "No patients to display."])])))
+                                                  [:td [:a.btn.btn-primary {:href (routes/app-path-for :patients/show :id (:id patient))} (l18n/t :common/show)]
+                                                       [:a.btn.btn-primary {:href (routes/app-path-for :patients/edit :id (:id patient))} (l18n/t :common/edit)]]]))]
+              [:div (l18n/t :patients/no-patients)])])))
 
 (defn patient-show-component []
   (let [patient-id (:id @logic/current-params)
@@ -60,21 +61,21 @@
     (fn []
       [:div [:div.clearfix [:div.pull-right [:a.btn.btn-primary {:href (if-let [patient-id (:id @patient)]
                                                                          (routes/app-path-for :patients/edit :id patient-id))}
-                                                                "Edit patient"]]]
+                                             (l18n/t :patients/edit-patient)]]]
             [:div [:h2 (:firstname @patient) " " (:surname @patient)]
                   [:hr]
-                  [:div.row [:div.col-lg-3 [:b "Personal ID"] [:br]
+                  [:div.row [:div.col-lg-3 [:b (l18n/t :personal-information/personal-id)] [:br]
                                            (:personal-id @patient)]
-                            [:div.col-lg-3 [:b "Address"] [:br]
+                            [:div.col-lg-3 [:b (l18n/t :personal-information/address)] [:br]
                                            (address-for-patient @patient)]]
-                  [:h2 "Wizyty"]
+                  [:h2 (l18n/t :patients/appointments)]
                   [:hr]
                   (if-let [appointments (seq (:medical-visits @patient))]
                     [:div.row [:div.col-lg-12
                                   [:table.table.table-hover
                                          [:thead
-                                            [:th "Data"]
-                                            [:th "Lekarz"]]
+                                            [:th (l18n/t :appointments/date)]
+                                            [:th (l18n/t :appointments/employee)]]
                                           [:tbody
                                            (doall (for [appointment appointments]
                                                       ;(log/error "DERP" appointment)
@@ -84,10 +85,10 @@
                                                                (ui-utils/date->str (:date appointment))]]
                                                          [:td [:a {:href (routes/app-path-for :employees/show :id (get-in appointment [:employee :id]))}
                                                                (person->str (:employee appointment))]]]))]]]]
-                    [:div.row [:div.col-lg-12.text-muted "Brak wizyt"]])]])))
+                    [:div.row [:div.col-lg-12.text-muted (l18n/t :patients/no-appointments)]])]])))
 
 (defn patient-form-fields-component [patient errors {:keys [on-submit submit-button-text] :as opts}]
-  (let [form-input (ui-utils/make-form-field-maker patient errors)]
+  (let [form-input (ui-utils/make-form-field-maker patient errors {:l18n-scopes [:patients :personal-information]})]
     [:form
      [:div.row
       [:div.col-lg-4 [form-input :firstname]]
@@ -134,8 +135,9 @@
                                                                                                (reset! errors errors')))))
                           (.preventDefault e))]
     (fn []
-      [:div "patient create form"
-       [patient-form-fields-component patient errors {:on-submit on-submit :submit-button-text "Create"}]])))
+      [:div
+       [:h1 (l18n/t :patients/create-patient)]
+       [patient-form-fields-component patient errors {:on-submit on-submit :submit-button-text (l18n/t :patients/create-patient)}]])))
 
 (defn patient-edit-form-component []
   (let [patient-id (:id @logic/current-params)
@@ -161,5 +163,6 @@
                                                                    (reset! patient (dissoc response :class :medical-visits :prescription)))
                               [:error   {:response ({:errors errors'} :as response)}] (log/error "received response" response))))
     (fn []
-      [:div "patient edit form"
-       [patient-form-fields-component patient errors {:on-submit on-submit :submit-button-text "Edit"}]])))
+      [:div
+       [:h2 (l18n/t :patients/edit-patient)]
+       [patient-form-fields-component patient errors {:on-submit on-submit :submit-button-text (l18n/t :patients/edit-patient)}]])))

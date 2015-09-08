@@ -41,12 +41,12 @@
                            [:a.dropdown-toggle {:href "#"
                                                 :on-click (fn [e] (swap! dropdown-open? not)
                                                             (.preventDefault e))}
-                            "Menu" [:span.caret]]
+                            (l18n/t :common/menu) [:span.caret]]
                            [:ul.dropdown-menu
                             [:li [:a {:href "#"
                                       :on-click (fn [e] (api/set-api-token! nil)
                                                   (.preventDefault e))}
-                                  "Log out"]]]])})))
+                                  (l18n/t :common/log-out)]]]])})))
 
 (defn user-component []
   (if @api/logged-in?
@@ -117,7 +117,7 @@
 (defn footer-component []
   [:footer
    [:div.container
-    [:p.text-muted "Footer"]]]
+    [:p.text-muted (l18n/t :common/footer-text)]]]
   #_[rc-core/h-box :children ["Footer"]])
 
 (defn login-fields-component [form-data & [{:keys [errors] :as options}]]

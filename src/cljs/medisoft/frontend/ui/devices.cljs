@@ -43,12 +43,12 @@
        (if (> (count @devices) 0)
          [:table.table.table-hover
            [:thead
-             [:th "Serial"]
-             [:th "Producer"]
-             [:th "Room"]
-             [:th "Purchase Date"]
-             [:th "Warranty Date"]
-             [:th {:style {:width "200px"}} "Actions"]]
+             [:th (l18n/t :devices/serial)]
+             [:th (l18n/t :devices/producer)]
+             [:th (l18n/t :devices/room)]
+             [:th (l18n/t :devices/purchase-date)]
+             [:th (l18n/t :devices/warranty-date)]
+             [:th {:style {:width "200px"}} (l18n/t :common/actions)]]
            (log/debug "devices" @devices)
            (doall (for [device @devices]
                     ^{:key (ui-utils/key-for device)}
@@ -63,7 +63,7 @@
                       [:td
                         [:a.btn.btn-primary {:href (routes/app-path-for :devices/show :id (:id device))} (l18n/t :common/show)]
                         [:a.btn.btn-primary {:href (routes/app-path-for :devices/edit :id (:id device))} (l18n/t :common/edit)]]]))]
-         [:div "No devices to display."])])))
+         [:div (l18n/t :devices/new-device)])])))
 
 (defn device-show-component []
   (let [device-id (:id @logic/current-params)
@@ -77,23 +77,23 @@
       [:div
        [:div.clearfix [:div.pull-right [:a.btn.btn-primary {:href (if-let [device-id (:id @device)]
                                                                     (routes/app-path-for :devices/edit :id device-id))}
-                                        "Edit device"]]]
+                                        (l18n/t :devices/edit-device)]]]
        [:div
          [:div.row
-           [:div.col-lg-4 [:b "Producer"] [:br] (:producer @device)]
-           [:div.col-lg-4 [:b "Producer"] [:br] (:producer @device)]]
+           [:div.col-lg-4 [:b (l18n/t :devices/serial)] [:br] (:serial @device)]
+           [:div.col-lg-4 [:b (l18n/t :devices/producer)] [:br] (:producer @device)]]
          [:br]
          [:div.row
-           [:div.col-lg-4 [:b "Purchase date"] [:br] (ui-utils/date->str (:purchase-date @device))]
-           [:div.col-lg-4 [:b "Warranty date"] [:br] (ui-utils/date->str (:warranty-date @device))]]
+           [:div.col-lg-4 [:b (l18n/t :devices/purchase-date)] [:br] (ui-utils/date->str (:purchase-date @device))]
+           [:div.col-lg-4 [:b (l18n/t :devices/warranty-date)] [:br] (ui-utils/date->str (:warranty-date @device))]]
          [:br]
          [:div.row
-          [:div.col-lg-4 [:b "Room"] [:br] (when-let [room (:room @device)]
+          [:div.col-lg-4 [:b (l18n/t :devices/room)] [:br] (when-let [room (:room @device)]
                                              [:a {:href (routes/app-path-for :rooms/show :id (:id room))}
                                               (:number room)])]]]])))
 
 (defn device-form-fields-component [device errors {:keys [on-submit submit-button-text] :as opts}]
-  (let [form-input (ui-utils/make-form-field-maker device errors)
+  (let [form-input (ui-utils/make-form-field-maker device errors {:l18n-scopes [:devices]})
         rooms (reagent.core/atom [])
         purchase-date (ratom/reaction (:purchase-date @device))
         warranty-date (ratom/reaction (:warranty-date @device))]
@@ -169,8 +169,9 @@
       (log/debug "device" @device)
       (log/debug "device purchase date" (ui-utils/date->str (:purchase-date @device)))
       (log/debug "device warranty date" (ui-utils/date->str (:warranty-date @device)))
-      [:div "device create form"
-       [device-form-fields-component device errors {:on-submit on-submit :submit-button-text "Create"}]])))
+      [:div
+       [:h1 (l18n/t :devices/create-device)]
+       [device-form-fields-component device errors {:on-submit on-submit :submit-button-text (l18n/t :devices/create-device)}]])))
 
 (defn device-edit-form-component []
   (let [device-id (:id @logic/current-params)
@@ -199,5 +200,6 @@
       (log/debug "device" @device)
       (log/debug "device purchase date" (ui-utils/date->str (:purchase-date @device)))
       (log/debug "device warranty date" (ui-utils/date->str (:warranty-date @device)))
-      [:div "device edit form"
-       [device-form-fields-component device errors {:on-submit on-submit :submit-button-text "Edit"}]])))
+      [:div
+       [:h1 (l18n/t :devices/edit-device)]
+       [device-form-fields-component device errors {:on-submit on-submit :submit-button-text (l18n/t :devices/edit-device)}]])))

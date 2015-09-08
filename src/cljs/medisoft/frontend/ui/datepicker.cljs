@@ -27,7 +27,22 @@
   (when (seq iso8601)
     (parse (formatters :basic-date) iso8601)))
 
-(defn- month-label [date] (unparse month-format date))
+(defn- month-label [date] #_(unparse month-format date)
+  (str (condp = (month date)
+         1  "styczeń"
+         2  "luty"
+         3  "marzec"
+         4  "kwiecień"
+         5  "maj"
+         6  "czerwiec"
+         7  "lipiec"
+         8  "sierpień"
+         9  "wrzesień"
+         10 "październik"
+         11 "listopad"
+         12 "grudzień")
+       " "
+       (year date)))
 
 (defn- dec-month [date] (minus date (months 1)))
 
@@ -121,13 +136,13 @@
      ;; could be done via more clever mapping but avoiding abscurity here.
      ;; style each day label based on if it is in enabled-days
      (conj template-row
-           [:th (style 7) "SUN"]
-           [:th (style 1) "MON"]
-           [:th (style 2) "TUE"]
-           [:th (style 3) "WED"]
-           [:th (style 4) "THU"]
-           [:th (style 5) "FRI"]
-           [:th (style 6) "SAT"])]))
+           [:th (style 7) "ND"  #_"SUN"]
+           [:th (style 1) "PON" #_"MON"]
+           [:th (style 2) "WT"  #_"TUE"]
+           [:th (style 3) "ŚR"  #_"WED"]
+           [:th (style 4) "CZW" #_"THU"]
+           [:th (style 5) "PT"  #_"FRI"]
+           [:th (style 6) "SOB" #_"SAT"])]))
 
 
 (defn- selection-changed

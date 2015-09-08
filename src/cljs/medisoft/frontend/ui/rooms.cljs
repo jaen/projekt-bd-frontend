@@ -30,15 +30,15 @@
     (fn []
       [:div [:div.clearfix [:div.pull-right [:a.btn.btn-success {:href (routes/app-path-for :rooms/create)} (l18n/t :rooms/new-room)]]]
        (if (> (count @rooms) 0)
-         [:table.table.table-hover [:thead [:th "Number"]
-                                    [:th {:style {:width "200px"}} "Actions"]]
+         [:table.table.table-hover [:thead [:th (l18n/t :rooms/number)]
+                                    [:th {:style {:width "200px"}} (l18n/t :common/actions)]]
           (log/debug "rooms" @rooms)
           (doall (for [room @rooms]
                    ^{:key (ui-utils/key-for room)}
                    [:tr [:td (:number room)]
                     [:td [:a.btn.btn-primary {:href (routes/app-path-for :rooms/show :id (:id room))} (l18n/t :common/show)]
                      [:a.btn.btn-primary {:href (routes/app-path-for :rooms/edit :id (:id room))} (l18n/t :common/edit)]]]))]
-         [:div "No rooms to display."])])))
+         [:div (l18n/t :rooms/no-roms)])])))
 
 (defn room-show-component []
   (let [room-id (:id @logic/current-params)
@@ -51,14 +51,14 @@
     (fn []
       [:div [:div.clearfix [:div.pull-right [:a.btn.btn-primary {:href (if-let [room-id (:id @room)]
                                                                          (routes/app-path-for :rooms/edit :id room-id))}
-                                             "Edit room"]]]
-       [:div [:h2 "Room" (:number @room)]
+                                             (l18n/t :rooms/edit-room)]]]
+       [:div [:h2 "Pokój " (:number @room)]
         [:hr]
         [:div.row
-         [:div.col-lg-12 [:b "Devices"] [:br]
-          [:table.table.table-hover [:thead [:th "Serial"]
-                                     [:th "Producer"]
-                                     [:th {:style {:width "200px"}} "Actions"]]
+         [:div.col-lg-12 [:b (l18n/t :rooms/devices)] [:br]
+          [:table.table.table-hover [:thead [:th (l18n/t :devices/serial)]
+                                     [:th (l18n/t :devices/producer)]
+                                     [:th {:style {:width "200px"}} (l18n/t :common/actions)]]
             (doall (for [device (:devices @room)]
                    ^{:key (ui-utils/key-for device)}
                    [:tr [:td (:serial device)]
@@ -70,7 +70,7 @@
   {:number ""})
 
 (defn room-form-fields-component [room errors {:keys [on-submit submit-button-text] :as opts}]
-  (let [form-input (ui-utils/make-form-field-maker room errors)]
+  (let [form-input (ui-utils/make-form-field-maker room errors {:l18n-scopes [:rooms]})]
     [:form
      [:div.row
       [:div.col-lg-5 [form-input :number]]]
@@ -94,8 +94,9 @@
                     (.preventDefault e))]
     (fn []
       (log/debug "room" @room)
-      [:div "room create form"
-       [room-form-fields-component room errors {:on-submit on-submit :submit-button-text "Create"}]])))
+      [:div
+       [:h2 (l18n/t :rooms/create-room)]
+       [room-form-fields-component room errors {:on-submit on-submit :submit-button-text (l18n/t :rooms/create-room)}]])))
 
 (defn room-edit-form-component []
   (let [room-id (:id @logic/current-params)
@@ -121,5 +122,6 @@
                                                                     (reset! room (dissoc response :class :devices)))
                                [:error   {:response ({:errors errors'} :as response)}] (log/error "received response" response))))
     (fn []
-      [:div "patient edit form"
-       [room-form-fields-component room errors {:on-submit on-submit :submit-button-text "Edit"}]])))
+      [:div
+       [:h2 (l18n/t :rooms/edit-room)]
+       [room-form-fields-component room errors {:on-submit on-submit :submit-button-text (l18n/t :rooms/edit-room)}]])))

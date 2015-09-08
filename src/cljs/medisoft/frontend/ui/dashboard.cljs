@@ -10,5 +10,5 @@
 (defn dashboard-component []
   [rc-core/v-box :size "1"
    :children [[rc-core/h-box :size "1"
-               :children [[nav-component]
+               :children [[:div "Dashboard"]] #_[[nav-component]
                           [content-component]]]]])

@@ -309,4 +309,4 @@
                    (if (:group-header? opt)
                      ^{:key (str id)} [choice-group-heading group]
                      ^{:key (str id)} [choice-item id label callback internal-model])))
-               [:li.no-results (str "No results match \"" @filter-text "\"")])]])]))))
+               [:li.no-results (str "Brak wyników dla \"" @filter-text "\"")])]])]))))

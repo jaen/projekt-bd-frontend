@@ -14,7 +14,8 @@
             [medisoft.frontend.log :as log]
             [medisoft.frontend.validations :as validations]
             [medisoft.frontend.routes :as routes]
-            [medisoft.frontend.history :as history]))
+            [medisoft.frontend.history :as history]
+            [medisoft.frontend.l18n :as l18n]))
 
 (defn address-for-patient [patient]
   [:span (:street-name patient) " " (:house-number patient) "/" (:flat-number patient) [:br]
@@ -28,17 +29,17 @@
                                                                     (log/debug "received response" response))
                                               [:error   _] :nothing)))
     (fn []
-      [:div [:div.clearfix [:div.pull-right [:a.btn.btn-success {:href (routes/app-path-for :job-titles/create)} "New job title"]]]
+      [:div [:div.clearfix [:div.pull-right [:a.btn.btn-success {:href (routes/app-path-for :job-titles/create)} (l18n/t :job-titles/new-job-title)]]]
        (if (> (count @job-title) 0)
-         [:table.table.table-hover [:thead [:th "Name"]
-                                           [:th {:style {:width "200px"}} "Actions"]]
+         [:table.table.table-hover [:thead [:th (l18n/t :job-titles/name)]
+                                           [:th {:style {:width "200px"}} (l18n/t :common/actions)]]
           (doall (for [job-title @job-title]
                    ^{:key (ui-utils/key-for job-title)}
                     [:tr
                       [:td (:name job-title)]
-                      [:td [:a.btn.btn-primary {:href (routes/app-path-for :job-titles/show :id (:id job-title))} "Show"]
-                           [:a.btn.btn-primary {:href (routes/app-path-for :job-titles/edit :id (:id job-title))} "Edit"]]]))]
-         [:div "No job titles to display."])])))
+                      [:td [:a.btn.btn-primary {:href (routes/app-path-for :job-titles/show :id (:id job-title))} (l18n/t :common/show)]
+                           [:a.btn.btn-primary {:href (routes/app-path-for :job-titles/edit :id (:id job-title))} (l18n/t :common/edit)]]]))]
+         [:div (l18n/t :job-titles/no-job-titles)])])))
 
 (defn job-title-show-component []
   (let [job-title-id (:id @logic/current-params)
@@ -51,11 +52,11 @@
     (fn []
       [:div [:div.clearfix [:div.pull-right [:a.btn.btn-primary {:href (if-let [job-title-id (:id @job-title)]
                                                                          (routes/app-path-for :job-titles/edit :id job-title-id))}
-                                             "Edit job title"]]]
+                                             (l18n/t :job-titles/edit-job-title)]]]
        [:div [:h2 (:name @job-title)]]])))
 
 (defn job-title-form-fields-component [job-title errors {:keys [on-submit submit-button-text] :as opts}]
-  (let [form-input (ui-utils/make-form-field-maker job-title errors)]
+  (let [form-input (ui-utils/make-form-field-maker job-title errors {:l18n-scopes [:job-titles]})]
     [:form
      [:div.row
       [:div.col-lg-4 [form-input :name]]]
@@ -78,8 +79,9 @@
                                                                                                            (reset! errors errors')))))
                     (.preventDefault e))]
     (fn []
-      [:div "patient create form"
-       [job-title-form-fields-component job-title errors {:on-submit on-submit :submit-button-text "Create"}]])))
+      [:div
+       [:h2 (l18n/t :job-titles/new-job-title)]
+       [job-title-form-fields-component job-title errors {:on-submit on-submit :submit-button-text (l18n/t :job-titles/new-job-title)}]])))
 
 (defn job-title-edit-form-component []
   (let [job-title-id (:id @logic/current-params)
@@ -105,5 +107,6 @@
                                                                    (reset! job-title (dissoc response :class)))
                               [:error   {:response ({:errors errors'} :as response)}] (log/error "received response" response))))
     (fn []
-      [:div "patient edit form"
-       [job-title-form-fields-component job-title errors {:on-submit on-submit :submit-button-text "Edit"}]])))
+      [:div
+       [:h2 (l18n/t :job-titles/edit-job-title)]
+       [job-title-form-fields-component job-title errors {:on-submit on-submit :submit-button-text (l18n/t :job-titles/edit-job-title)}]])))
